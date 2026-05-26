@@ -1,0 +1,23 @@
+{
+  "categories": [
+    { "id": "all", "label": "Tudo" },
+    { "id": "entradas", "label": "Entradas & Petiscos" },
+    { "id": "massas", "label": "Massas & Risotos" },
+    { "id": "principais", "label": "Pratos Principais" },
+    { "id": "sobremesas", "label": "Sobremesas" }
+  ],
+  "items": [
+    { "cat": "entradas", "name": "Dadinhos de Tapioca", "desc": "Dadinhos crocantes de tapioca com molho agridoce apimentado da casa.", "price": "", "tag": "Casa" },
+    { "cat": "entradas", "name": "Coxinha de Banana da Terra com Rabada", "desc": "Massa de banana da terra recheada com rabada desfiada — releitura autoral do Cheff Gastão.", "price": "", "tag": "Autoral" },
+    { "cat": "entradas", "name": "Bobozinho de Camarão", "desc": "Versão bistrô do clássico baiano, em porção individual, servido com torradas.", "price": "" },
+    { "cat": "entradas", "name": "Camarões na Manteiga", "desc": "Camarões salteados na manteiga com o molho do chef.", "price": "", "tag": "Casa" },
+
+    { "cat": "massas", "name": "Risoto Caprese com Camarão Salteado", "desc": "Risoto cremoso de tomate e mussarela de búfala, finalizado com camarões salteados e manjericão fresco.", "price": "", "tag": "Signature" },
+    { "cat": "massas", "name": "Ravióli de Banana da Terra", "desc": "Massa fresca recheada com banana da terra ao molho de cogumelos frescos.", "price": "", "tag": "Autoral" },
+
+    { "cat": "principais", "name": "Hambúrguer Artesanal", "desc": "Blend bovino da casa, pão brioche tostado, acompanhamentos do chef.", "price": "" },
+    { "cat": "principais", "name": "Feijoada Individual", "desc": "Feijoada completa, porção individual. Servida apenas aos sábados no almoço.", "price": "", "tag": "Sábados" },
+
+    { "cat": "sobremesas", "name": "Mousse Meio Amargo", "desc": "Mousse aerada de chocolate meio amargo com toque de flor de sal.", "price": "" }
+  ]
+}
