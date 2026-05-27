@@ -155,12 +155,17 @@ function Landing({ go }) {
         <div className="hero-content">
           <div className="hero-eyebrow reveal">Restaurante & Bistrô · Praia da Costa, Vila Velha</div>
 
-          <InlineLogo />
-          <h1 className="hero-wordmark reveal d2">Carmelita</h1>
-          <p className="hero-tagline reveal d3">
+          <div className="hero-logo-group">
+            <InlineLogo />
+            <div className="hero-text-stack">
+              <h1 className="hero-wordmark reveal d2">Carmelita</h1>
+              <p className="hero-resto reveal d3">RESTÔ</p>
+            </div>
+          </div>
+          <p className="hero-tagline reveal d4">
             Cozinha autoral.<br/><em>Arte na mesa.</em>
           </p>
-          <div className="hero-ctas reveal d4">
+          <div className="hero-ctas reveal d5">
             <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar mesa</button>
             <button className="btn btn-ghost" onClick={() => go("cardapio")}>Ver cardápio</button>
           </div>

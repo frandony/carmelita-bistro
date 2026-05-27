@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Great+Vibes&family=Oswald:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Great+Vibes&family=Pinyon+Script&family=Oswald:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Raleway:wght@300;400&display=swap"
     rel="stylesheet" />
 
   <style>
@@ -34,7 +34,7 @@
       --font-display: "DM Serif Display", "Times New Roman", serif;
       --font-rock: "Oswald", "Arial Narrow", sans-serif;
       --font-body: "Cormorant Garamond", "Georgia", serif;
-      --font-script: "Exmouth", cursive;
+      --font-script: "Pinyon Script", "Great Vibes", "Exmouth", cursive;
     }
 
     * {
@@ -327,39 +327,87 @@
       background: var(--bronze-rock);
     }
 
+    .hero-logo-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 0;
+      margin: 40px 0 0;
+    }
+
     .hero-logo-mark {
       display: block;
-      width: clamp(164px, 21.6vw, 328px);
-      margin: 50px auto clamp(-190px, calc(10px - 13vw), -50px);
+      width: auto;
+      margin: 0 auto;
+      position: static;
+      transform: translateY(-20px);
       filter: drop-shadow(0 2px 14px rgba(201, 168, 76, 0.4));
     }
 
     .hero-logo-mark svg {
       display: block;
-      width: 100%;
+      width: clamp(175px, 46vw, 475px);
       height: auto;
     }
 
     .hero-wordmark {
       font-family: var(--font-script);
-      font-size: clamp(110px, 18vw, 240px);
-      letter-spacing: 0.01em;
-      line-height: 1.12;
-      padding: 0.08em 0.14em 0.14em;
-      background: linear-gradient(135deg, #c9a84c 0%, #f5e27a 25%, #b8860b 50%, #f0d060 75%, #c9a84c 100%);
+      font-size: clamp(108px, 14.5vw, 188px);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 0.95;
+      padding: 0;
+      background: linear-gradient(148deg,
+          #b07c2a 0%,
+          #e8d48a 20%,
+          #faf2d8 38%,
+          #d4a840 55%,
+          #f0e09c 74%,
+          #b88030 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin: -0.08em 0 2px;
-      position: relative;
+      display: block;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 0 10px;
+      text-align: center;
       white-space: nowrap;
-      filter: drop-shadow(0 2px 14px rgba(201, 168, 76, 0.45));
+      filter:
+        drop-shadow(0 0 22px rgba(212, 168, 60, 0.28)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.32));
+      animation: wordmarkGlow 5s ease-in-out infinite;
+    }
+
+    @keyframes wordmarkGlow {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 22px rgba(212, 168, 60, 0.28)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.32));
+      }
+
+      50% {
+        filter: drop-shadow(0 0 34px rgba(212, 168, 60, 0.46)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.32));
+      }
     }
 
     .hero-wordmark .amp {
       display: inline-block;
       font-style: italic;
       transform: translateY(-0.05em);
+    }
+
+    .hero-resto {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(13px, 1.4vw, 20px);
+      font-weight: 300;
+      letter-spacing: 0.8em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      opacity: 0.88;
+      margin: 0;
+      padding-left: 0.8em;
+      transform: translateY(-100px);
     }
 
     .hero-tagline {
@@ -369,7 +417,6 @@
       font-size: clamp(20px, 2.4vw, 30px);
       color: var(--bege-areia);
       letter-spacing: 0.01em;
-      margin-bottom: 56px;
       max-width: 640px;
       margin-left: auto;
       margin-right: auto;
@@ -399,6 +446,8 @@
       overflow: hidden;
       border: 1px solid transparent;
       text-align: center;
+      margin-top: 80px;
+      margin-bottom: 80px;
     }
 
     .btn-primary {
@@ -491,9 +540,51 @@
         font-size: 10px;
       }
 
+      .hero-logo-mark svg {
+        width: clamp(200px, 58vw, 400px);
+      }
+
       .hero-logo-mark {
-        width: clamp(126px, 28.35vw, 227px);
-        margin-bottom: clamp(-130px, calc(10px - 17vw), -60px);
+        transform: translateY(-25px);
+      }
+
+      .hero-text-stack {
+        transform: translateY(40px);
+      }
+
+      .hero-logo-group {
+        transform: translateY(10px);
+      }
+    }
+
+    /* ===== Notebook (701px – 1366px) ===== */
+    @media (max-width: 1366px) and (min-width: 701px) {
+      .hero-logo-mark svg {
+        width: clamp(155px, 39vw, 500 px);
+      }
+
+      .hero-logo-mark {
+        transform: translateY(-60px);
+      }
+
+      .hero-text-stack {
+        transform: translateY(-30px);
+      }
+
+      .hero-wordmark.reveal.in {
+        transform: translateY(-75px);
+      }
+
+      .hero-resto.reveal.in {
+        transform: translateY(-75px);
+      }
+
+      .hero-eyebrow.reveal.in {
+        transform: translateY:(100px);
+      }
+
+      .hero-ctas.reveal.in {
+        transform: translateY(-50px);
       }
     }
 
@@ -1810,13 +1901,38 @@
     }
 
     .hero-wordmark.reveal {
-      transform: translateX(-25px) translateY(28px);
+      transform: translateY(100px);
     }
 
     .hero-wordmark.reveal.in {
-      transform: translateX(-25px) translateY(0);
+      transform: translateY(-100px);
     }
 
+    .hero-resto.reveal.in {
+      transform: translateY(-100px);
+    }
+
+    .hero-eyebrow.reveal.in {
+      transform: translateY(60px);
+    }
+
+    .hero-ctas.reveal.in {
+      transform: translateY(-40px);
+    }
+
+    @media (max-width: 1366px) and (min-width: 701px) {
+      .hero-eyebrow {
+        display: none;
+      }
+
+      .hero-tagline {
+        display: none;
+      }
+
+      .hero-ctas.reveal.in {
+        transform: translateY(-130px);
+      }
+    }
 
     .reveal.d2 {
       transition-delay: 0.16s;
@@ -2153,7 +2269,7 @@
       /* Hero */
       .hero-wordmark {
         white-space: normal;
-        font-size: clamp(110px, 22vw, 200px);
+        font-size: clamp(88px, 22vw, 160px);
       }
 
       .hero-tagline {
@@ -2312,7 +2428,7 @@
       }
 
       .hero-wordmark {
-        font-size: clamp(80px, 18vw, 130px);
+        font-size: clamp(76px, 20vw, 128px);
       }
 
       .container {
