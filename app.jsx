@@ -45,14 +45,14 @@ function Placeholder({ kind = "stripes", label, note }) {
 // ====== Nav ======
 function Nav({ route, go, onCta }) {
   const [scrolled, setScrolled] = useState(false);
-  const [showLogo, setShowLogo] = useState(false);
+  const [overHero, setOverHero] = useState(route === "home");
   const [mobile, setMobile] = useState(false);
 
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 30);
       const hero = document.querySelector(".hero");
-      setShowLogo(hero ? hero.getBoundingClientRect().bottom <= 0 : true);
+      setOverHero(hero ? hero.getBoundingClientRect().bottom > 120 : false);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -69,9 +69,9 @@ function Nav({ route, go, onCta }) {
   return (
     <>
       <nav className={"nav" + (scrolled ? " scrolled" : "")}>
-        <div className="nav-brand" onClick={() => go("home")}>
-          <img src="assets/logo Carmelita nav.svg" alt="Carmelita"
-               className={"nav-brand-logo" + (showLogo ? " visible" : "")} />
+        <div className={"nav-brand" + (overHero ? " discreet" : "")} onClick={() => go("home")}>
+          <span className="nav-brand-text">Carmelita</span>
+          <span className="nav-brand-resto">Restô</span>
         </div>
         <div className="nav-links">
           {links.map((l) => (
@@ -82,13 +82,20 @@ function Nav({ route, go, onCta }) {
             </a>
           ))}
         </div>
-        <button className="nav-cta" onClick={onCta}>Reservar mesa</button>
+        <div className="nav-right">
+          <a className="nav-phone" href="tel:+5527997475391">(27) 99747-5391</a>
+          <button className="nav-cta" onClick={onCta}>Reservas</button>
+        </div>
         <button className="nav-burger" onClick={() => setMobile(true)} aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
       </nav>
       <div className={"mobile-menu" + (mobile ? " open" : "")}>
         <button className="mobile-close" onClick={() => setMobile(false)}>×</button>
+        <div className="mobile-brand">
+          <span className="nav-brand-text">Carmelita</span>
+          <span className="nav-brand-resto">Restô</span>
+        </div>
         {links.map((l) => (
           <a key={l.id}
              className={"nav-link" + (route === l.id ? " active" : "")}
@@ -96,10 +103,13 @@ function Nav({ route, go, onCta }) {
             {l.label}
           </a>
         ))}
-        <button className="nav-cta" style={{ display: "inline-block", marginTop: 16 }}
-                onClick={() => { onCta(); setMobile(false); }}>
-          Reservar mesa
-        </button>
+        <a className="nav-cta" style={{ display: "inline-block", marginTop: 16 }}
+           href="tel:+5527997475391">
+          Ligar · (27) 99747-5391
+        </a>
+        <div className="mobile-foot">
+          Qui & Sex · 19h–23h<br />Sáb & Dom · 12h–16h
+        </div>
       </div>
     </>
   );
@@ -122,16 +132,16 @@ function Footer({ go }) {
           </div>
           <div className="footer-col">
             <h4>Horários</h4>
-            <p>Ter–Sex · 19h às 23h30</p>
-            <p>Sáb · 12h–15h e 19h–23h30</p>
-            <p>Dom e Seg · Fechado</p>
+            <p>Qui e Sex · 19h às 23h</p>
+            <p>Sáb e Dom · 12h às 16h</p>
+            <p>Seg a Qua · Fechado</p>
           </div>
           <div className="footer-col">
             <h4>Contato</h4>
-            <a href="tel:+5527997475391">(27) 99747-5391</a>
+            <a href="tel:+5527997475391">(27) 99747-5391 · Reservas por ligação</a>
             <a href="https://instagram.com/carmelita_restaurante" target="_blank" rel="noopener">@carmelita_restaurante</a>
             <a href="https://facebook.com/carmelitaresto01" target="_blank" rel="noopener">Facebook · carmelitaresto01</a>
-            <a href="https://www.tripadvisor.com.br" target="_blank" rel="noopener">TripAdvisor · 4,8 ★</a>
+            <a href="https://www.tripadvisor.com/Restaurant_Review-g303319-d8228154" target="_blank" rel="noopener">TripAdvisor · 4,8 ★</a>
           </div>
         </div>
         <div className="footer-bottom">
@@ -181,7 +191,7 @@ function Landing({ go }) {
         </div>
 
         <div className="hero-meta">
-          <span className="hero-meta-item"><span className="dot"></span>Casa aberta · esta noite</span>
+          <span className="hero-meta-item"><span className="dot"></span>Qui a Dom · Reservas por ligação</span>
           <span className="hero-meta-item">Cheff Gastão · cozinha autoral</span>
         </div>
       </section>
@@ -245,7 +255,8 @@ function Landing({ go }) {
 
           <div className="mood-grid">
             <div className="mood-tile t1 reveal d1">
-              <Placeholder kind="warm" label="01 · Salão intimista" note="luz âmbar · arte na parede" />
+              <img className="mood-photo" src="assets/Parte de fundo do site do carmelita.png"
+                   alt="Salão do Carmelita — mesas de madeira e quadros de músicos na parede" loading="lazy" />
               <span className="mood-label">Salão</span>
             </div>
             <div className="mood-tile t2 reveal d2">
@@ -257,8 +268,8 @@ function Landing({ go }) {
               <span className="mood-label">Arte</span>
             </div>
             <div className="mood-tile t4 reveal d2">
-              <Placeholder kind="pale" label="04 · Mise en place" note="mão do chef" />
-              <span className="mood-label">Mise</span>
+              <Placeholder kind="pale" label="04 · Feijoada da Fê" note="sáb & dom · por Fernanda Bezzi" />
+              <span className="mood-label">Fim de semana</span>
             </div>
             <div className="mood-tile t5 reveal d3">
               <Placeholder kind="warm" label="05 · Coxinha de rabada" note="autoral · banana da terra" />
@@ -289,7 +300,7 @@ function Landing({ go }) {
           <span className="block-eyebrow reveal"><span className="num">03 /</span>Eventos especiais</span>
           <h2 className="block-title reveal d1" style={{ margin: "0 0 24px" }}>Confrarias e <em>noites temáticas</em>.</h2>
           <p className="block-sub reveal d2" style={{ margin: "0 0 40px" }}>
-            Às terças, abrimos a casa para confrarias e eventos gastronômicos. A Confraria Vinha Velha já fez história aqui. Agende o seu grupo e venha criar uma.
+            Em dias de casa fechada, abrimos para confrarias e eventos gastronômicos. A Confraria Vinha Velha já fez história aqui. Agende o seu grupo e venha criar a sua.
           </p>
           <div className="reveal d3">
             <a href="https://wa.me/5527997475391" target="_blank" rel="noopener" className="btn btn-ghost">
@@ -324,9 +335,9 @@ function Sobre({ go }) {
   useReveal();
 
   const reconhecimentos = [
-    { num: "4,8", label: "no TripAdvisor", sub: "19 avaliações · nota máxima" },
-    { num: "Top 10%", label: "de Vila Velha", sub: "Travellers' Choice · TripAdvisor" },
-    { num: "4.622", label: "seguidores", sub: "@carmelita_restaurante · Instagram" },
+    { num: "4,8", label: "no TripAdvisor", sub: "19 avaliações · #62 de 700 restaurantes em Vila Velha" },
+    { num: "4,6", label: "no Google", sub: "32 avaliações" },
+    { num: "5,0", label: "no Facebook", sub: "25 avaliações · nota máxima" },
   ];
 
   return (
@@ -351,10 +362,11 @@ function Sobre({ go }) {
         <div className="container">
           <div className="sobre-editorial">
             <div className="chef-photo reveal">
-              <Placeholder kind="warm" label="Cheff Gastão · cozinha" note="criação autoral · Vila Velha" />
+              <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
+                   alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
               <div className="chef-photo-caption">
-                Cozinha
-                <span className="small">Cheff Gastão</span>
+                O salão
+                <span className="small">quadros de músicos · mesas postas</span>
               </div>
             </div>
             <div className="sobre-prose reveal d1">
@@ -362,12 +374,12 @@ function Sobre({ go }) {
                 A Fernanda e o Gastão não abriram apenas um restaurante — abriram uma extensão da própria casa. Ela acolhe no salão com calor humano e simpatia que os clientes não esquecem. Ele cria na cozinha com liberdade e técnica, assinando pratos que surpreendem a cada visita.
               </p>
               <p>
-                A proposta do Carmelita é encantar com novidades e preços justos. Mistura de restaurante com bistrô, a casa une culinária elaborada a um ambiente intimista: decoração com referência a quadros de grandes artistas, luz certa, boa música e uma conversa fácil.
+                A proposta do Carmelita é encantar com novidades e preços justos. Mistura de restaurante com bistrô, a casa une culinária elaborada a um ambiente intimista: quadros de grandes músicos na parede, luz certa, boa música e uma conversa fácil.
               </p>
               <p>
-                Os clientes percebem — e valorizam — o fato de os donos estarem sempre presentes e atentos. Isso não é detalhe: é o coração do Carmelita.
+                Nos fins de semana, o almoço tem assinatura própria: a Feijoada da Fê, feita pela própria Fernanda Bezzi, com arroz, torresmo, couve, farofinha e laranja. Os clientes percebem — e valorizam — o fato de os donos estarem sempre presentes e atentos. Isso não é detalhe: é o coração do Carmelita.
               </p>
-              <div className="signature">— Fernanda & Gastão, proprietários</div>
+              <div className="signature">— Fernanda Bezzi & Cheff Gastão, proprietários</div>
             </div>
           </div>
         </div>
@@ -415,103 +427,127 @@ function Sobre({ go }) {
   );
 }
 
+// ====== Dados dos cardápios (localStorage do admin > menu.json > bloco inline) ======
+const DATA_KEY = "carmelita-data-v2";
+
+function normalizeMenus(d) {
+  return d && Array.isArray(d.menus) ? d : null;
+}
+
+function loadMenusData() {
+  try {
+    const stored = localStorage.getItem(DATA_KEY);
+    if (stored) {
+      const d = normalizeMenus(JSON.parse(stored));
+      if (d) return d;
+    }
+  } catch {}
+  try {
+    const d = normalizeMenus(JSON.parse(document.getElementById("menu-data").textContent));
+    if (d) return d;
+  } catch {}
+  return { menus: [] };
+}
+
 // ====== Cardápio ======
+function MenuPrice({ price }) {
+  return price
+    ? <span className="menu-row-price"><span className="currency">R$ </span>{price}</span>
+    : <span className="menu-row-price price-tba">Consultar</span>;
+}
+
 function Cardapio({ go }) {
   useReveal();
-  const data = useMemo(() => {
-    try {
-      const stored = localStorage.getItem("carmelita-menu-v1");
-      if (stored) return JSON.parse(stored);
-    } catch {}
-    try { return JSON.parse(document.getElementById("menu-data").textContent); }
-    catch { return { categories: [], items: [] }; }
+  const [data, setData] = useState(loadMenusData);
+
+  // menu.json é a fonte publicada; edições locais do admin (localStorage) têm prioridade
+  useEffect(() => {
+    if (localStorage.getItem(DATA_KEY)) return;
+    fetch("menu.json")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { const n = normalizeMenus(d); if (n) setData(n); })
+      .catch(() => {});
   }, []);
-  const [active, setActive] = useState("all");
 
-  const filtered = useMemo(() => (
-    active === "all" ? data.items : data.items.filter((i) => i.cat === active)
-  ), [active, data.items]);
+  const menus = data.menus.filter((m) => m.public !== false);
+  const [menuId, setMenuId] = useState(null);
+  const menu = menus.find((m) => m.id === menuId) || menus[0] || { categories: [], items: [] };
 
-  const counts = useMemo(() => {
-    const c = { all: data.items.length };
-    data.items.forEach((i) => { c[i.cat] = (c[i.cat] || 0) + 1; });
-    return c;
-  }, [data.items]);
-
-  const catLabel = (cat) => (data.categories.find((c) => c.id === cat) || {}).label || cat;
+  const sections = useMemo(() => {
+    const cats = menu.categories.filter((c) => c.id !== "all");
+    const known = new Set(cats.map((c) => c.id));
+    const list = cats
+      .map((c) => ({ ...c, items: menu.items.filter((i) => i.cat === c.id) }))
+      .filter((c) => c.items.length > 0);
+    const orphans = menu.items.filter((i) => !known.has(i.cat));
+    if (orphans.length) list.push({ id: "_outros", label: "Outros pratos", items: orphans });
+    return list;
+  }, [menu]);
 
   return (
     <div className="page page-enter">
       <section className="menu-hero">
         <div className="container">
-          <div className="menu-hero-row">
-            <div>
-              <span className="block-eyebrow reveal"><span className="num">C /</span>Cardápio da casa</span>
-              <h1 className="block-title reveal d1">Cozinha autoral do <em>Cheff Gastão.</em></h1>
-            </div>
-            <div className="menu-hero-meta reveal d2">
-              <span className="em">Cardápio enxuto e criterioso</span>
-              <span>Pratos autorais e criações do chef. Produto sazonal, mão segura.</span>
-            </div>
-          </div>
+          <span className="block-eyebrow reveal"><span className="num">C /</span>Cardápio da casa</span>
+          <h1 className="block-title reveal d1">Cozinha autoral do <em>Cheff Gastão.</em></h1>
+          <p className="block-sub reveal d2">
+            Cardápio enxuto e criterioso — produto sazonal, mão segura. Preços sob consulta na casa.
+          </p>
         </div>
       </section>
 
-      <section className="container">
-        {/* Featured */}
-        <div className="featured reveal">
-          <div className="featured-img">
-            <Placeholder kind="warm" label="Prato da casa · vista superior" note="risoto · camarão · caprese" />
+      <section className="container menu-editorial">
+        {menus.length > 1 && (
+          <div className="menu-switch reveal">
+            {menus.map((m) => (
+              <button key={m.id}
+                      className={"menu-tab" + (m.id === menu.id ? " active" : "")}
+                      onClick={() => setMenuId(m.id)}>
+                <span className="menu-tab-name">{m.name}</span>
+                {m.subtitle ? <span className="menu-tab-sub">{m.subtitle}</span> : null}
+              </button>
+            ))}
           </div>
-          <div className="featured-body">
-            <span className="featured-badge">Destaque da Casa</span>
-            <h2 className="featured-title">Risoto Caprese com <em>Camarão Salteado</em>.</h2>
-            <p className="featured-desc">
-              Risoto cremoso de tomate e mussarela de búfala, finalizado com camarões salteados na manteiga e manjericão fresco. Uma das criações autorais mais elogiadas do Cheff Gastão — sofisticação e sabor em equilíbrio perfeito.
-            </p>
-            <div className="featured-bottom">
-              <div className="featured-price"><span className="price-tba">Consultar</span></div>
-              <div className="featured-meta">Prato autoral · Cheff Gastão</div>
+        )}
+
+        {menus.length === 1 && menu.subtitle && (
+          <div className="menu-single-sub reveal">{menu.subtitle}</div>
+        )}
+
+        {sections.map((sec, si) => (
+          <div className={`menu-section reveal d${(si % 3) + 1}`} key={menu.id + sec.id}>
+            <div className="menu-section-head">
+              <h2 className="menu-section-title">{sec.label}</h2>
+              <span className="menu-section-rule"></span>
             </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="filter-row reveal">
-          {data.categories.map((c) => (
-            <button key={c.id}
-                    className={"filter-tab" + (active === c.id ? " active" : "")}
-                    onClick={() => setActive(c.id)}>
-              {c.label}<span className="count">{counts[c.id] || 0}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Grid */}
-        <div className="menu-grid">
-          {filtered.map((it, i) => (
-            <div className={`menu-item reveal d${(i % 4) + 1}`} key={it.name}>
-              <div>
-                <div className="menu-item-header">
-                  <h3 className="menu-item-name">{it.name}</h3>
-                  {it.tag ? <span className="menu-item-tag">{it.tag}</span> : null}
+            <div className="menu-list">
+              {sec.items.map((it) => (
+                <div className="menu-row" key={it.name}>
+                  <div className="menu-row-top">
+                    <h3 className="menu-row-name">{it.name}</h3>
+                    {it.tag ? <span className="menu-item-tag">{it.tag}</span> : null}
+                    <span className="menu-row-leader"></span>
+                    <MenuPrice price={it.price} />
+                  </div>
+                  {it.desc ? <p className="menu-row-desc">{it.desc}</p> : null}
                 </div>
-                <p className="menu-item-desc">{it.desc}</p>
-                <div className="menu-item-cat">{catLabel(it.cat)}</div>
-              </div>
-              <div className="menu-item-price">
-                {it.price ? <><span className="currency">R$</span>{it.price}</> : <span className="price-tba">Consultar</span>}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
 
-        <div style={{ padding: "80px 0 60px", textAlign: "center" }}>
+        {sections.length === 0 && (
+          <p className="block-sub reveal" style={{ margin: "40px auto", textAlign: "center" }}>
+            Cardápio em atualização — ligue para a casa: (27) 99747-5391.
+          </p>
+        )}
+
+        <div style={{ padding: "60px 0 90px", textAlign: "center" }}>
           <p className="block-sub reveal" style={{ margin: "0 auto 32px" }}>
-            Trabalhamos com produto sazonal. Cardápio sujeito a variações conforme o mercado.
+            Trabalhamos com produto sazonal — o cardápio muda conforme o mercado. Reservas somente por ligação.
           </p>
           <div className="reveal d1">
-            <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar para esta noite</button>
+            <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar por telefone</button>
           </div>
         </div>
       </section>
@@ -524,46 +560,16 @@ function Cardapio({ go }) {
 // ====== Reservas ======
 function Reservas({ go }) {
   useReveal();
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    nome: "",
-    email: "",
-    data: "",
-    horario: "20:00",
-    pessoas: "2",
-    ocasiao: "",
-    obs: "",
-  });
-
-  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const onSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const reset = () => {
-    setSubmitted(false);
-    setForm({ nome: "", email: "", data: "", horario: "20:00", pessoas: "2", ocasiao: "", obs: "" });
-  };
-
-  const fmtDate = (d) => {
-    if (!d) return "—";
-    const [y, m, day] = d.split("-");
-    return `${day}.${m}.${y.slice(2)}`;
-  };
-
   return (
     <div className="page page-enter">
       <section className="reservas-wrap">
         <div className="container">
           <div className="reservas-grid">
             <div className="reservas-side">
-              <span className="block-eyebrow reveal"><span className="num">D /</span>Mesa reservada</span>
+              <span className="block-eyebrow reveal"><span className="num">D /</span>Sua mesa</span>
               <h2 className="reveal d1">Uma mesa<br/><em>à luz baixa.</em></h2>
               <p className="reveal d2">
-                O Carmelita é uma casa pequena e acolhedora. Reservas confirmadas pela Fernanda em até duas horas. Para grupos, fale diretamente conosco.
+                O Carmelita é uma casa pequena e acolhedora — e a agenda é curta. Reservas são feitas somente por ligação: a Fernanda atende, confere a agenda e confirma sua mesa na hora.
               </p>
               <p className="reveal d3" style={{ fontStyle: "italic", color: "var(--bege-areia)" }}>
                 Tolerância de 15 minutos · Após esse tempo, sua mesa retorna à fila da noite.
@@ -575,124 +581,38 @@ function Reservas({ go }) {
                   <div className="ri-value">Rua Piratininga, 111 — Lj 1<span className="small">Praia da Costa · Vila Velha · ES</span></div>
                 </div>
                 <div>
-                  <div className="ri-label">Contato direto</div>
-                  <div className="ri-value"><a href="tel:+5527997475391">(27) 99747-5391</a><span className="small">WhatsApp disponível</span></div>
+                  <div className="ri-label">Reservas</div>
+                  <div className="ri-value"><a href="tel:+5527997475391">(27) 99747-5391</a><span className="small">somente por ligação</span></div>
                 </div>
                 <div>
                   <div className="ri-label">Horários</div>
-                  <div className="ri-value">Ter–Sex · 19h às 23h30<span className="small">Sáb · 12h–15h e 19h–23h30</span></div>
+                  <div className="ri-value">Qui e Sex · 19h às 23h<span className="small">Sáb e Dom · 12h às 16h</span></div>
                 </div>
                 <div>
                   <div className="ri-label">Fechado</div>
-                  <div className="ri-value">Dom e Seg<span className="small">Terças abertas para eventos/confrarias</span></div>
+                  <div className="ri-value">Seg a Qua<span className="small">casa aberta para eventos e confrarias sob agendamento</span></div>
                 </div>
               </div>
             </div>
 
             <div className="reveal d2">
-              <div className="form-card">
-                {!submitted ? (
-                  <form onSubmit={onSubmit}>
-                    <div className="form-eyebrow">Formulário · Reserva</div>
-                    <div className="form-title">Diga-nos quando<br/>e quantos.</div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label htmlFor="nome">Nome</label>
-                        <input id="nome" type="text" required value={form.nome}
-                               onChange={set("nome")} placeholder="Como te chamar?" />
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="email">E-mail</label>
-                        <input id="email" type="email" required value={form.email}
-                               onChange={set("email")} placeholder="seu@email.com" />
-                      </div>
-                    </div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label htmlFor="data">Data</label>
-                        <input id="data" type="date" required value={form.data}
-                               onChange={set("data")} min={new Date().toISOString().slice(0,10)} />
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="horario">Horário</label>
-                        <select id="horario" value={form.horario} onChange={set("horario")}>
-                          {["19:00","19:30","20:00","20:30","21:00","21:30","22:00","22:30","23:00"].map((h) => (
-                            <option key={h} value={h}>{h}</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="form-row">
-                      <div className="form-field">
-                        <label htmlFor="pessoas">Número de pessoas</label>
-                        <select id="pessoas" value={form.pessoas} onChange={set("pessoas")}>
-                          {[1,2,3,4,5,6].map((n) => (
-                            <option key={n} value={n}>{n} {n === 1 ? "pessoa" : "pessoas"}</option>
-                          ))}
-                          <option value="6+">Mais de 6 (contatar a casa)</option>
-                        </select>
-                      </div>
-                      <div className="form-field">
-                        <label htmlFor="ocasiao">Ocasião especial <span style={{ color: "rgba(216,199,174,0.45)", letterSpacing: "0.18em" }}>· opcional</span></label>
-                        <select id="ocasiao" value={form.ocasiao} onChange={set("ocasiao")}>
-                          <option value="">—</option>
-                          <option value="Aniversário">Aniversário</option>
-                          <option value="Encontro">Encontro</option>
-                          <option value="Negócios">Negócios</option>
-                          <option value="Comemoração">Comemoração</option>
-                          <option value="Sem ocasião">Apenas porque sim</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="form-row">
-                      <div className="form-field full">
-                        <label htmlFor="obs">Observações <span style={{ color: "rgba(216,199,174,0.45)", letterSpacing: "0.18em" }}>· opcional</span></label>
-                        <input id="obs" type="text" value={form.obs}
-                               onChange={set("obs")} placeholder="Restrições, mesa preferida, surpresa para alguém…" />
-                      </div>
-                    </div>
-
-                    <button type="submit" className="form-submit">Confirmar reserva</button>
-                  </form>
-                ) : (
-                  <div className="confirm-screen">
-                    <div className="confirm-seal">
-                      <svg viewBox="0 0 120 120">
-                        <circle className="ring" cx="60" cy="60" r="57" />
-                        <circle cx="60" cy="60" r="48" stroke="rgba(138,106,68,0.3)" strokeWidth="1" fill="none" strokeDasharray="2 4" />
-                        <path className="check" d="M40 62 L54 76 L82 46" />
-                      </svg>
-                    </div>
-                    <h3 className="confirm-title">Mesa <em>reservada.</em></h3>
-                    <p className="confirm-sub">
-                      Obrigado, {form.nome.split(" ")[0] || "visitante"}. A Fernanda vai confirmar em até duas horas. Até lá!
-                    </p>
-
-                    <div className="confirm-ticket">
-                      <div>
-                        <div className="ct-label">Data</div>
-                        <div className="ct-value">{fmtDate(form.data)}</div>
-                      </div>
-                      <div>
-                        <div className="ct-label">Horário</div>
-                        <div className="ct-value">{form.horario}</div>
-                      </div>
-                      <div>
-                        <div className="ct-label">Pessoas</div>
-                        <div className="ct-value">{form.pessoas}</div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: "inline-flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-                      <button className="confirm-cta" onClick={reset}>Nova reserva</button>
-                      <button className="confirm-cta" onClick={() => go("cardapio")}>Ver cardápio</button>
-                    </div>
-                  </div>
-                )}
+              <div className="form-card call-card">
+                <div className="form-eyebrow">Reservas · Somente por ligação</div>
+                <div className="form-title">Ligue e garanta<br/>sua mesa.</div>
+                <p className="call-text">
+                  Sem formulário, sem espera. A reserva do Carmelita é feita por telefone, direto com a casa — do nosso jeito, com conversa.
+                </p>
+                <a className="form-submit call-btn" href="tel:+5527997475391">
+                  Ligar · (27) 99747-5391
+                </a>
+                <div className="call-hours">
+                  <span>Qui e Sex · 19h às 23h</span>
+                  <span>Sáb e Dom · 12h às 16h</span>
+                </div>
+                <p className="call-alt">
+                  Grupos, confrarias e eventos:{" "}
+                  <a href="https://wa.me/5527997475391" target="_blank" rel="noopener">WhatsApp da casa</a>
+                </p>
               </div>
             </div>
           </div>
@@ -706,41 +626,19 @@ function Reservas({ go }) {
 
 // ====== Admin ======
 const ADMIN_PASS = "carmelita2026";
-const MENU_KEY   = "carmelita-menu-v1";
-const PRESETS_KEY = "carmelita-presets-v1";
-const ACTIVE_KEY  = "carmelita-active-v1";
 
-function loadDefaultMenu() {
-  try { return JSON.parse(document.getElementById("menu-data").textContent); }
-  catch { return { categories: [], items: [] }; }
+function defaultMenusData() {
+  try {
+    const d = normalizeMenus(JSON.parse(document.getElementById("menu-data").textContent));
+    if (d) return d;
+  } catch {}
+  return { menus: [] };
 }
 
-function getDefaultPresets() {
-  const base = loadDefaultMenu();
-  const entradas = base.items.filter(it => it.cat === "entradas");
-  return [
-    {
-      id: "padrao",
-      name: "Cardápio Padrão",
-      categories: base.categories,
-      items: base.items,
-    },
-    {
-      id: "sabado",
-      name: "Cardápio de Sábado",
-      categories: base.categories,
-      items: base.items, // mesmo menu; feijoada já tem tag "Sábados"
-    },
-    {
-      id: "eventos",
-      name: "Cardápio de Eventos",
-      categories: [
-        { id: "all", label: "Tudo" },
-        { id: "entradas", label: "Entradas & Petiscos" },
-      ],
-      items: entradas,
-    },
-  ];
+function slugify(s) {
+  return s.toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || ("c_" + Date.now());
 }
 
 function Admin() {
@@ -748,48 +646,31 @@ function Admin() {
   const [pass, setPass]       = useState("");
   const [passErr, setPassErr] = useState(false);
 
-  const [presets, setPresets] = useState(() => {
-    try { const s = localStorage.getItem(PRESETS_KEY); if (s) return JSON.parse(s); } catch {}
-    return getDefaultPresets();
-  });
-  const [activeId, setActiveId] = useState(() => localStorage.getItem(ACTIVE_KEY) || "padrao");
-  const [editingId, setEditingId] = useState(() => localStorage.getItem(ACTIVE_KEY) || "padrao");
+  const [data, setData]   = useState(loadMenusData);
+  const [selId, setSelId] = useState(null);
+  const sel = data.menus.find(m => m.id === selId) || data.menus[0] || null;
 
-  const [editItem, setEditItem]   = useState(null);
-  const [editForm, setEditForm]   = useState({});
+  const [editItem, setEditItem]     = useState(null);
+  const [editForm, setEditForm]     = useState({});
   const [addingItem, setAddingItem] = useState(false);
-  const [newItem, setNewItem]     = useState({ cat: "", name: "", desc: "", price: "", tag: "" });
+  const [newItem, setNewItem]       = useState({ cat: "", name: "", desc: "", price: "", tag: "" });
+  const [newCat, setNewCat]         = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
-  const [renamingId, setRenamingId] = useState(null);
-  const [renameVal, setRenameVal]   = useState("");
+  const importRef = useRef(null);
 
-  const editingPreset = presets.find(p => p.id === editingId) || presets[0];
-
-  // Auto-save com debounce
+  // Auto-save com debounce (neste navegador)
   useEffect(() => {
     if (!authed) return;
     setSaveStatus("saving");
     const t = setTimeout(() => {
       try {
-        localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
-        localStorage.setItem(ACTIVE_KEY, activeId);
-        const active = presets.find(p => p.id === activeId);
-        if (active) localStorage.setItem(MENU_KEY, JSON.stringify({ categories: active.categories, items: active.items }));
+        localStorage.setItem(DATA_KEY, JSON.stringify(data));
         setSaveStatus("saved");
         setTimeout(() => setSaveStatus("idle"), 2000);
       } catch { setSaveStatus("idle"); }
-    }, 800);
+    }, 700);
     return () => clearTimeout(t);
-  }, [presets, activeId, authed]);
-
-  const manualSave = () => {
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
-    localStorage.setItem(ACTIVE_KEY, activeId);
-    const active = presets.find(p => p.id === activeId);
-    if (active) localStorage.setItem(MENU_KEY, JSON.stringify({ categories: active.categories, items: active.items }));
-    setSaveStatus("saved");
-    setTimeout(() => setSaveStatus("idle"), 2000);
-  };
+  }, [data, authed]);
 
   const login = (e) => {
     e.preventDefault();
@@ -797,67 +678,109 @@ function Admin() {
     else setPassErr(true);
   };
 
-  // Preset operations
-  const activatePreset = (id) => {
-    setActiveId(id);
-  };
-
-  const editPreset = (id) => {
-    setEditingId(id);
+  const selectMenu = (id) => {
+    setSelId(id);
     setEditItem(null);
     setAddingItem(false);
   };
 
-  const duplicatePreset = (id) => {
-    const src = presets.find(p => p.id === id);
-    if (!src) return;
-    const nid = "p_" + Date.now();
-    setPresets(ps => [...ps, { ...src, id: nid, name: src.name + " (cópia)" }]);
+  // ── Operações de cardápio ──
+  const updateSel = (patch) =>
+    setData(d => ({ menus: d.menus.map(m => m.id === sel.id ? { ...m, ...patch } : m) }));
+
+  const addMenu = () => {
+    const nid = "m_" + Date.now();
+    setData(d => ({ menus: [...d.menus, {
+      id: nid, name: "Novo cardápio", subtitle: "", public: false,
+      categories: [{ id: "pratos", label: "Pratos" }], items: [],
+    }] }));
+    selectMenu(nid);
   };
 
-  const deletePreset = (id) => {
-    if (presets.length <= 1) { alert("Não é possível excluir o único cardápio."); return; }
-    if (!confirm("Excluir este cardápio predefinido?")) return;
-    const remaining = presets.filter(p => p.id !== id);
-    setPresets(remaining);
-    if (editingId === id) setEditingId(remaining[0].id);
-    if (activeId  === id) setActiveId(remaining[0].id);
+  const duplicateMenu = () => {
+    const nid = "m_" + Date.now();
+    setData(d => ({ menus: [...d.menus, { ...sel, id: nid, name: sel.name + " (cópia)", public: false }] }));
+    selectMenu(nid);
   };
 
-  const startRename = (id, name) => { setRenamingId(id); setRenameVal(name); };
-  const saveRename  = () => {
-    setPresets(ps => ps.map(p => p.id === renamingId ? { ...p, name: renameVal } : p));
-    setRenamingId(null);
+  const deleteMenu = () => {
+    if (data.menus.length <= 1) { alert("Não é possível excluir o único cardápio."); return; }
+    if (!confirm(`Excluir o cardápio "${sel.name}"?`)) return;
+    const remaining = data.menus.filter(m => m.id !== sel.id);
+    setData({ menus: remaining });
+    selectMenu(remaining[0].id);
   };
 
-  const newPreset = () => {
-    const nid = "p_" + Date.now();
-    setPresets(ps => [...ps, { id: nid, name: "Novo Cardápio", categories: editingPreset.categories, items: [] }]);
-    setEditingId(nid);
-    setEditItem(null);
-    setAddingItem(false);
+  // ── Categorias ──
+  const addCategory = () => {
+    const label = newCat.trim();
+    if (!label) return;
+    const id = slugify(label);
+    if (sel.categories.some(c => c.id === id)) { setNewCat(""); return; }
+    updateSel({ categories: [...sel.categories, { id, label }] });
+    setNewCat("");
   };
 
-  // Item operations on editingPreset
-  const updateEditing = (patch) =>
-    setPresets(ps => ps.map(p => p.id === editingId ? { ...p, ...patch } : p));
+  const removeCategory = (id) => {
+    const emptied = sel.items.some(it => it.cat === id);
+    if (emptied && !confirm("Há pratos nesta categoria. Eles ficarão em \"Outros pratos\" até serem reclassificados. Remover mesmo assim?")) return;
+    updateSel({ categories: sel.categories.filter(c => c.id !== id) });
+  };
 
+  // ── Pratos ──
   const removeItem = (idx) =>
-    updateEditing({ items: editingPreset.items.filter((_, i) => i !== idx) });
+    updateSel({ items: sel.items.filter((_, i) => i !== idx) });
 
-  const startEditItem = (idx) => { setEditItem(idx); setEditForm({ ...editingPreset.items[idx] }); };
+  const startEditItem = (idx) => { setEditItem(idx); setEditForm({ ...sel.items[idx] }); };
 
   const saveEditItem = () => {
-    updateEditing({ items: editingPreset.items.map((it, i) => i === editItem ? { ...editForm } : it) });
+    updateSel({ items: sel.items.map((it, i) => i === editItem ? { ...editForm } : it) });
     setEditItem(null);
   };
 
   const addItem = () => {
     if (!newItem.name.trim() || !newItem.cat) return;
-    updateEditing({ items: [...editingPreset.items, { ...newItem }] });
+    updateSel({ items: [...sel.items, { ...newItem }] });
     setNewItem({ cat: "", name: "", desc: "", price: "", tag: "" });
     setAddingItem(false);
   };
+
+  // ── Exportar / Importar / Restaurar ──
+  const exportJson = () => {
+    const blob = new Blob([JSON.stringify(data, null, 2) + "\n"], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "menu.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importJson = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const d = normalizeMenus(JSON.parse(reader.result));
+        if (!d) throw new Error();
+        setData(d);
+        selectMenu(d.menus[0] && d.menus[0].id);
+      } catch { alert("Arquivo inválido — esperado um menu.json exportado por este painel."); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const resetDefault = () => {
+    if (!confirm("Descartar as alterações deste navegador e voltar ao cardápio publicado no site?")) return;
+    localStorage.removeItem(DATA_KEY);
+    const d = defaultMenusData();
+    setData(d);
+    selectMenu(d.menus[0] && d.menus[0].id);
+  };
+
+  const catLabel = (id) => (sel.categories.find(c => c.id === id) || {}).label || "Sem categoria";
 
   const ef = (k) => (e) => setEditForm(f => ({ ...f, [k]: e.target.value }));
   const nf = (k) => (e) => setNewItem(f => ({ ...f, [k]: e.target.value }));
@@ -889,199 +812,218 @@ function Admin() {
       <div className="admin-page container">
 
         {/* ── Cabeçalho ── */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 48 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
           <div>
             <div className="block-eyebrow" style={{ marginBottom: 8 }}>Gestão do Cardápio</div>
             <h1 className="block-title" style={{ margin: 0 }}>Painel <em>Admin</em>.</h1>
           </div>
-          <div className="admin-actions">
-            <span className="admin-autosave-status" style={{ marginLeft: "auto" }}>
-              {saveStatus === "saving" && "Salvando…"}
-              {(saveStatus === "saved" || saveStatus === "idle") && "Salvo automaticamente ✓"}
+          <div className="admin-actions" style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span className="admin-autosave-status">
+              {saveStatus === "saving" ? "Salvando…" : "Salvo neste navegador ✓"}
             </span>
+            <button className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={exportJson}>
+              Baixar menu.json
+            </button>
+            <button className="btn btn-ghost" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={() => importRef.current && importRef.current.click()}>
+              Importar
+            </button>
+            <button className="btn btn-ghost" style={{ padding: "10px 20px", fontSize: "0.8rem", opacity: 0.55 }} onClick={resetDefault}>
+              Restaurar padrão
+            </button>
+            <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importJson} />
           </div>
         </div>
 
-        {/* ── Cardápios Predefinidos ── */}
-        <div style={{ marginBottom: 56 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
-            <div>
-              <h2 className="block-title" style={{ margin: 0, fontSize: "1.6rem" }}>Selecione e <em>edite</em>.</h2>
-            </div>
-            <button className="btn btn-ghost" onClick={newPreset}>+ Novo cardápio</button>
-          </div>
+        <p className="admin-notice">
+          As alterações valem <strong>apenas neste navegador</strong>. Para publicar no site para todo mundo,
+          clique em <code>Baixar menu.json</code> e substitua o arquivo <code>menu.json</code> do projeto (ou envie ao desenvolvedor).
+        </p>
 
-          <div className="presets-grid">
-            {presets.map(p => (
-              <div key={p.id} className={
-                "preset-card" +
-                (p.id === activeId  ? " preset-active"  : "") +
-                (p.id === editingId ? " preset-editing" : "")
-              }>
-                <div className="preset-badges">
-                  {p.id === activeId  && <span className="badge-active">● Ativo (público)</span>}
-                  {p.id === editingId && p.id !== activeId && <span className="badge-editing">Em edição</span>}
-                </div>
-
-                {renamingId === p.id ? (
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", margin: "8px 0 12px" }}>
-                    <input
-                      className="preset-rename-input"
-                      value={renameVal}
-                      onChange={e => setRenameVal(e.target.value)}
-                      onKeyDown={e => { if (e.key === "Enter") saveRename(); if (e.key === "Escape") setRenamingId(null); }}
-                      autoFocus
-                    />
-                    <button className="btn btn-primary" style={{ padding: "6px 14px", fontSize: "0.85rem" }} onClick={saveRename}>OK</button>
-                    <button className="btn btn-ghost" style={{ padding: "6px 10px", fontSize: "0.85rem" }} onClick={() => setRenamingId(null)}>✕</button>
-                  </div>
-                ) : (
-                  <div className="preset-name">{p.name}</div>
-                )}
-
-                <div className="preset-count">{p.items.length} {p.items.length === 1 ? "prato" : "pratos"}</div>
-
-                <div className="preset-actions">
-                  {p.id !== activeId && (
-                    <button className="btn btn-primary" style={{ padding: "7px 16px", fontSize: "0.85rem" }}
-                            onClick={() => activatePreset(p.id)}>
-                      Ativar
-                    </button>
-                  )}
-                  <button className="btn btn-ghost" style={{ padding: "7px 16px", fontSize: "0.85rem" }}
-                          onClick={() => editPreset(p.id)}>
-                    {p.id === editingId ? "Editando ↓" : "Editar itens"}
-                  </button>
-                  <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem" }}
-                          onClick={() => startRename(p.id, p.name)}>
-                    Renomear
-                  </button>
-                  <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem" }}
-                          onClick={() => duplicatePreset(p.id)}>
-                    Duplicar
-                  </button>
-                  {presets.length > 1 && (
-                    <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem", opacity: 0.45 }}
-                            onClick={() => deletePreset(p.id)}>
-                      Excluir
-                    </button>
-                  )}
-                </div>
-              </div>
+        {/* ── Lista + Editor ── */}
+        <div className="admin-layout">
+          <aside className="admin-side">
+            <div className="admin-side-title">Cardápios</div>
+            {data.menus.map(m => (
+              <button key={m.id}
+                      className={"admin-menu-btn" + (sel && m.id === sel.id ? " sel" : "")}
+                      onClick={() => selectMenu(m.id)}>
+                <span className="amb-name">{m.name}</span>
+                <span className="amb-meta">
+                  {m.items.length} {m.items.length === 1 ? "prato" : "pratos"}
+                  <span className={m.public !== false ? "amb-public" : "amb-hidden"}>
+                    {m.public !== false ? " · visível no site" : " · oculto"}
+                  </span>
+                </span>
+              </button>
             ))}
-          </div>
-        </div>
+            <button className="btn btn-ghost" style={{ marginTop: 14, width: "100%", padding: "12px" }} onClick={addMenu}>
+              + Novo cardápio
+            </button>
+          </aside>
 
-        {/* ── Editor de itens ── */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
-            <div>
-              <h2 className="block-title" style={{ margin: 0, fontSize: "1.6rem" }}>
-                <em>{editingPreset?.name}</em>
-                {editingId === activeId && <span className="badge-active" style={{ marginLeft: 16, fontSize: "0.7rem" }}>Ativo</span>}
-              </h2>
-            </div>
-            <button className="btn btn-primary" onClick={() => setAddingItem(true)}>+ Adicionar prato</button>
-          </div>
+          <div className="admin-editor">
+            {!sel ? (
+              <p style={{ opacity: 0.45, fontStyle: "italic" }}>Nenhum cardápio — crie um ao lado.</p>
+            ) : (
+              <>
+                {/* Identidade do cardápio */}
+                <div className="admin-edit-form" style={{ marginBottom: 28 }}>
+                  <div className="admin-form-grid">
+                    <div className="form-field">
+                      <label>Nome do cardápio</label>
+                      <input type="text" value={sel.name} onChange={e => updateSel({ name: e.target.value })} />
+                    </div>
+                    <div className="form-field">
+                      <label>Subtítulo (dias e horário)</label>
+                      <input type="text" value={sel.subtitle || ""} placeholder="Ex: Sábado & Domingo · 12h às 16h"
+                             onChange={e => updateSel({ subtitle: e.target.value })} />
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginTop: 16 }}>
+                    <label className="admin-toggle">
+                      <input type="checkbox" checked={sel.public !== false}
+                             onChange={e => updateSel({ public: e.target.checked })} />
+                      <span>Visível no site</span>
+                    </label>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem" }} onClick={duplicateMenu}>Duplicar</button>
+                      {data.menus.length > 1 && (
+                        <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem", opacity: 0.5 }} onClick={deleteMenu}>Excluir</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-          {addingItem && (
-            <div className="admin-edit-form">
-              <h3 style={{ marginBottom: 16, fontSize: "1.1rem" }}>Novo prato</h3>
-              <div className="admin-form-grid">
-                <div className="form-field">
-                  <label>Categoria</label>
-                  <select value={newItem.cat} onChange={nf("cat")}>
-                    <option value="">— escolher —</option>
-                    {editingPreset.categories.filter(c => c.id !== "all").map(c => (
-                      <option key={c.id} value={c.id}>{c.label}</option>
+                {/* Categorias */}
+                <div style={{ marginBottom: 28 }}>
+                  <div className="admin-side-title" style={{ marginBottom: 12 }}>Categorias</div>
+                  <div className="admin-cats">
+                    {sel.categories.filter(c => c.id !== "all").map(c => (
+                      <span key={c.id} className="admin-cat-chip">
+                        {c.label}
+                        <button onClick={() => removeCategory(c.id)} aria-label={`Remover ${c.label}`}>×</button>
+                      </span>
                     ))}
-                  </select>
+                    <span className="admin-cat-add">
+                      <input type="text" value={newCat} placeholder="Nova categoria…"
+                             onChange={e => setNewCat(e.target.value)}
+                             onKeyDown={e => { if (e.key === "Enter") addCategory(); }} />
+                      <button className="btn btn-ghost" style={{ padding: "6px 12px", fontSize: "0.8rem" }} onClick={addCategory}>Adicionar</button>
+                    </span>
+                  </div>
                 </div>
-                <div className="form-field">
-                  <label>Nome do prato</label>
-                  <input type="text" value={newItem.name} onChange={nf("name")} placeholder="Ex: Risoto de Camarão" />
-                </div>
-                <div className="form-field" style={{ gridColumn: "1 / -1" }}>
-                  <label>Descrição</label>
-                  <textarea value={newItem.desc} onChange={nf("desc")} rows={2} placeholder="Ingredientes e preparo..." />
-                </div>
-                <div className="form-field">
-                  <label>Preço (R$) — vazio = "Consultar"</label>
-                  <input type="text" value={newItem.price} onChange={nf("price")} placeholder="Ex: 58" />
-                </div>
-                <div className="form-field">
-                  <label>Tag (opcional)</label>
-                  <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex: Autoral, Casa, Sábados" />
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                <button className="btn btn-primary" onClick={addItem}>Adicionar</button>
-                <button className="btn btn-ghost" onClick={() => setAddingItem(false)}>Cancelar</button>
-              </div>
-            </div>
-          )}
 
-          {editingPreset.items.length === 0 && !addingItem && (
-            <p style={{ opacity: 0.45, fontStyle: "italic", padding: "32px 0" }}>Nenhum prato neste cardápio. Clique em "+ Adicionar prato" para começar.</p>
-          )}
+                {/* Pratos */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
+                  <div className="admin-side-title" style={{ margin: 0 }}>Pratos</div>
+                  <button className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={() => setAddingItem(true)}>
+                    + Adicionar prato
+                  </button>
+                </div>
 
-          <div className="admin-items-list">
-            {editingPreset.items.map((it, idx) => (
-              <div key={idx} className="admin-item-row">
-                {editItem === idx ? (
-                  <div className="admin-edit-form" style={{ width: "100%" }}>
+                {addingItem && (
+                  <div className="admin-edit-form">
+                    <h3 style={{ marginBottom: 16, fontSize: "1.1rem" }}>Novo prato</h3>
                     <div className="admin-form-grid">
                       <div className="form-field">
                         <label>Categoria</label>
-                        <select value={editForm.cat} onChange={ef("cat")}>
-                          {editingPreset.categories.filter(c => c.id !== "all").map(c => (
+                        <select value={newItem.cat} onChange={nf("cat")}>
+                          <option value="">— escolher —</option>
+                          {sel.categories.filter(c => c.id !== "all").map(c => (
                             <option key={c.id} value={c.id}>{c.label}</option>
                           ))}
                         </select>
                       </div>
                       <div className="form-field">
-                        <label>Nome</label>
-                        <input type="text" value={editForm.name} onChange={ef("name")} />
+                        <label>Nome do prato</label>
+                        <input type="text" value={newItem.name} onChange={nf("name")} placeholder="Ex: Risoto de Camarão" />
                       </div>
                       <div className="form-field" style={{ gridColumn: "1 / -1" }}>
                         <label>Descrição</label>
-                        <textarea value={editForm.desc} onChange={ef("desc")} rows={2} />
+                        <textarea value={newItem.desc} onChange={nf("desc")} rows={2} placeholder="Ingredientes e preparo…" />
                       </div>
                       <div className="form-field">
-                        <label>Preço (vazio = Consultar)</label>
-                        <input type="text" value={editForm.price} onChange={ef("price")} />
+                        <label>Preço (R$) — vazio = "Consultar"</label>
+                        <input type="text" value={newItem.price} onChange={nf("price")} placeholder="Ex: 58" />
                       </div>
                       <div className="form-field">
-                        <label>Tag</label>
-                        <input type="text" value={editForm.tag || ""} onChange={ef("tag")} />
+                        <label>Tag (opcional)</label>
+                        <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex: Autoral, Casa, Sáb & Dom" />
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                      <button className="btn btn-primary" onClick={saveEditItem}>Salvar</button>
-                      <button className="btn btn-ghost" onClick={() => setEditItem(null)}>Cancelar</button>
+                      <button className="btn btn-primary" onClick={addItem}>Adicionar</button>
+                      <button className="btn btn-ghost" onClick={() => setAddingItem(false)}>Cancelar</button>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    <div className="admin-item-info">
-                      <span className="menu-item-tag" style={{ marginBottom: 4, display: "inline-block" }}>
-                        {(editingPreset.categories.find(c => c.id === it.cat) || {}).label || it.cat}
-                      </span>
-                      <strong style={{ display: "block", fontSize: "1.05rem" }}>{it.name}</strong>
-                      <span style={{ opacity: 0.6, fontSize: "0.9rem" }}>{it.desc}</span>
-                    </div>
-                    <div className="admin-item-price">
-                      {it.price ? `R$ ${it.price}` : <span className="price-tba">Consultar</span>}
-                      {it.tag && <span className="menu-item-tag" style={{ marginLeft: 8 }}>{it.tag}</span>}
-                    </div>
-                    <div className="admin-item-actions">
-                      <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem" }} onClick={() => startEditItem(idx)}>Editar</button>
-                      <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem", opacity: 0.5 }} onClick={() => removeItem(idx)}>Remover</button>
-                    </div>
-                  </>
                 )}
-              </div>
-            ))}
+
+                {sel.items.length === 0 && !addingItem && (
+                  <p style={{ opacity: 0.45, fontStyle: "italic", padding: "24px 0" }}>
+                    Nenhum prato neste cardápio. Clique em "+ Adicionar prato" para começar.
+                  </p>
+                )}
+
+                <div className="admin-items-list">
+                  {sel.items.map((it, idx) => (
+                    <div key={idx} className="admin-item-row">
+                      {editItem === idx ? (
+                        <div className="admin-edit-form" style={{ width: "100%" }}>
+                          <div className="admin-form-grid">
+                            <div className="form-field">
+                              <label>Categoria</label>
+                              <select value={editForm.cat} onChange={ef("cat")}>
+                                {sel.categories.filter(c => c.id !== "all").map(c => (
+                                  <option key={c.id} value={c.id}>{c.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                            <div className="form-field">
+                              <label>Nome</label>
+                              <input type="text" value={editForm.name} onChange={ef("name")} />
+                            </div>
+                            <div className="form-field" style={{ gridColumn: "1 / -1" }}>
+                              <label>Descrição</label>
+                              <textarea value={editForm.desc} onChange={ef("desc")} rows={2} />
+                            </div>
+                            <div className="form-field">
+                              <label>Preço (vazio = Consultar)</label>
+                              <input type="text" value={editForm.price} onChange={ef("price")} />
+                            </div>
+                            <div className="form-field">
+                              <label>Tag</label>
+                              <input type="text" value={editForm.tag || ""} onChange={ef("tag")} />
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+                            <button className="btn btn-primary" onClick={saveEditItem}>Salvar</button>
+                            <button className="btn btn-ghost" onClick={() => setEditItem(null)}>Cancelar</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="admin-item-info">
+                            <span className="menu-item-tag" style={{ marginBottom: 4, display: "inline-block" }}>
+                              {catLabel(it.cat)}
+                            </span>
+                            <strong style={{ display: "block", fontSize: "1.05rem" }}>{it.name}</strong>
+                            <span style={{ opacity: 0.6, fontSize: "0.9rem" }}>{it.desc}</span>
+                          </div>
+                          <div className="admin-item-price">
+                            {it.price ? `R$ ${it.price}` : <span className="price-tba">Consultar</span>}
+                            {it.tag && <span className="menu-item-tag" style={{ marginLeft: 8 }}>{it.tag}</span>}
+                          </div>
+                          <div className="admin-item-actions">
+                            <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem" }} onClick={() => startEditItem(idx)}>Editar</button>
+                            <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem", opacity: 0.5 }} onClick={() => removeItem(idx)}>Remover</button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

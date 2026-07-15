@@ -1,0 +1,49 @@
+PALETA ALTERNATIVA — "SÓ DOURADO REFINADO" (opção 1)
+=====================================================
+
+O site hoje usa a opção 2: base dark + dourado com TOQUES DE AZUL
+(--azul-carmelita: #2596D1 / --azul-glow: #5FB4E3), inspirados na
+identidade real da casa (logo branca em círculo azul e faixa azul da
+parede do salão).
+
+Se um dia você quiser voltar para a opção 1 — "somente dourado,
+refinado com os tons âmbar das luminárias que aparecem nos stories
+noturnos" — o caminho é este:
+
+1) TROCAR AS VARIÁVEIS DE AZUL POR TONS ÂMBAR
+   Em index.html, no bloco :root, substitua:
+
+      --azul-carmelita: #2596D1;   →   --ambar-vivo: #C98A3D;
+      --azul-glow: #5FB4E3;        →   --ambar-claro: #E3B270;
+
+   Os tons âmbar acima foram tirados da luz das luminárias pendentes
+   que aparecem nas fotos noturnas do Instagram (stories do cardápio).
+
+2) ONDE O AZUL É USADO HOJE (buscar por "azul" no index.html)
+   - .nav-link:hover ................ cor do hover dos links da nav
+   - .nav-phone:hover ............... hover do telefone na nav
+   - .menu-tab:hover / .menu-tab.active::after
+                                      borda e sublinhado do seletor de
+                                      cardápios (Jantar / Fim de semana)
+   - .menu-item-tag ................. tags dos pratos ("Autoral", "Casa",
+                                      "Sáb & Dom")
+   - .tl-dot ........................ bolinhas da seção Reconhecimento
+                                      (página Sobre)
+   - .footer-col a:hover ............ hover dos links do rodapé
+   - .call-alt a .................... link de WhatsApp no card de reservas
+   - .admin-menu-btn:hover / .amb-public / .admin-toggle input
+                                      detalhes do painel admin
+
+   Basta trocar cada var(--azul-carmelita) por var(--ambar-vivo) e cada
+   var(--azul-glow) por var(--ambar-claro) — ou, se preferir manter tudo
+   no bronze que já existe, usar var(--bronze-rock) e var(--bronze-glow).
+
+3) RESULTADO ESPERADO DA OPÇÃO 1
+   Um site monocromático quente: preto vintage + bronze + âmbar, sem
+   nenhuma cor fria. Mais próximo da atmosfera noturna do salão (luz
+   baixa e pendentes acesos) e 100% alinhado à hero dourada do Gastão,
+   porém sem a referência à identidade azul oficial da marca (logo do
+   Instagram e parede do salão).
+
+Nenhuma outra parte do site precisa mudar — hero, tipografia, fundos e
+animações são idênticos nas duas opções.
