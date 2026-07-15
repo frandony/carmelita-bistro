@@ -45,13 +45,19 @@ function Placeholder({ kind = "stripes", label, note }) {
 // ====== Nav ======
 function Nav({ route, go, onCta }) {
   const [scrolled, setScrolled] = useState(false);
+  const [showLogo, setShowLogo] = useState(false);
   const [mobile, setMobile] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 30);
+      const hero = document.querySelector(".hero");
+      setShowLogo(hero ? hero.getBoundingClientRect().bottom <= 0 : true);
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [route]);
 
   const links = [
     { id: "home", label: "Início" },
@@ -64,10 +70,8 @@ function Nav({ route, go, onCta }) {
     <>
       <nav className={"nav" + (scrolled ? " scrolled" : "")}>
         <div className="nav-brand" onClick={() => go("home")}>
-          <div className="nav-brand-mark">
-            <img src="assets/carmelita-logo.png" alt="Carmelita" />
-          </div>
-          <div className="nav-brand-text">CARMELITA</div>
+          <img src="assets/logo Carmelita nav.svg" alt="Carmelita"
+               className={"nav-brand-logo" + (showLogo ? " visible" : "")} />
         </div>
         <div className="nav-links">
           {links.map((l) => (
@@ -165,7 +169,12 @@ function Landing({ go }) {
           <p className="hero-tagline reveal d4">
             Cozinha autoral.<br/><em>Arte na mesa.</em>
           </p>
-          <div className="hero-ctas reveal d5">
+          <p className="hero-verse reveal d5">
+            A gente não quer só comida, a gente quer bebida, diversão, balé<br/>
+            A gente não quer só comida, a gente quer a vida como a vida quer.
+            <span className="hero-verse-author">Titãs</span>
+          </p>
+          <div className="hero-ctas reveal d6">
             <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar mesa</button>
             <button className="btn btn-ghost" onClick={() => go("cardapio")}>Ver cardápio</button>
           </div>
