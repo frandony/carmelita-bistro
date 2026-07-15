@@ -856,7 +856,7 @@ function Admin() {
                 </span>
               </button>
             ))}
-            <button className="btn btn-ghost" style={{ marginTop: 14, width: "100%", padding: "12px" }} onClick={addMenu}>
+            <button className="btn btn-ghost admin-add-btn" onClick={addMenu}>
               + Novo cardápio
             </button>
           </aside>

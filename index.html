@@ -229,6 +229,30 @@
       display: none;
     }
 
+    /* Notebook: evita colisão entre marca, links centrais e ações à direita */
+    @media (max-width: 1200px) and (min-width: 881px) {
+      .nav {
+        padding: 16px 28px;
+      }
+
+      .nav-phone {
+        display: none;
+      }
+
+      .nav-links {
+        gap: 26px;
+      }
+
+      .nav-link {
+        font-size: 12px;
+        letter-spacing: 0.24em;
+      }
+
+      .nav-brand-text {
+        font-size: 26px;
+      }
+    }
+
     .mobile-menu {
       position: fixed;
       inset: 0;
@@ -353,6 +377,14 @@
       background-size: cover, cover, cover, 150% auto;
       background-position: center;
       background-attachment: fixed;
+    }
+
+    /* Mobile/tablet: fixed attachment é bugado em navegadores móveis */
+    @media (max-width: 880px) {
+      .hero-bg {
+        background-attachment: scroll;
+        background-size: cover, cover, cover, cover;
+      }
     }
 
     .hero-bg::after {
@@ -1107,6 +1139,16 @@
       margin-top: 24px;
     }
 
+    @media (max-width: 1200px) and (min-width: 901px) {
+      .sobre-editorial {
+        gap: 56px;
+      }
+
+      .sobre-grid {
+        gap: 48px;
+      }
+    }
+
     @media (max-width: 900px) {
 
       .sobre-grid,
@@ -1436,20 +1478,92 @@
       white-space: nowrap;
     }
 
+    /* ── Cardápio mobile: design em cards (mesma paleta) ── */
     @media (max-width: 700px) {
+
+      /* Seletor vira controle segmentado compacto */
       .menu-switch {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        gap: 0;
+        border: 1px solid rgba(216, 199, 174, 0.22);
+        margin: 24px 0 48px;
       }
 
       .menu-tab {
+        flex: 1;
         min-width: 0;
+        padding: 14px 8px 12px;
+        border: none;
+        border-right: 1px solid rgba(216, 199, 174, 0.18);
+        gap: 5px;
+      }
+
+      .menu-tab:last-child {
+        border-right: none;
+      }
+
+      .menu-tab:hover {
+        border-color: rgba(216, 199, 174, 0.18);
+      }
+
+      .menu-tab.active {
+        border-color: rgba(216, 199, 174, 0.18);
+        background: rgba(138, 106, 68, 0.14);
+      }
+
+      .menu-tab-name {
+        font-size: 17px;
+      }
+
+      .menu-tab-sub {
+        font-size: 8px;
+        letter-spacing: 0.2em;
+      }
+
+      /* Título da categoria centralizado com filete curto */
+      .menu-section-head {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .menu-section-title {
+        white-space: normal;
+      }
+
+      .menu-section-rule {
+        flex: none;
+        width: 64px;
+        background: linear-gradient(90deg, transparent, var(--bronze-rock), transparent);
+      }
+
+      /* Pratos viram cards */
+      .menu-list {
+        display: grid;
+        gap: 14px;
+      }
+
+      .menu-row {
+        border: 1px solid rgba(216, 199, 174, 0.14);
+        border-left: 2px solid rgba(138, 106, 68, 0.55);
+        background: linear-gradient(160deg, var(--grafite-soft) 0%, rgba(138, 106, 68, 0.07) 100%);
+        padding: 18px 16px 16px;
+      }
+
+      .menu-row:last-child {
+        border-bottom: 1px solid rgba(216, 199, 174, 0.14);
       }
 
       .menu-row-top {
         flex-wrap: wrap;
-        gap: 8px 12px;
+        gap: 8px 10px;
+        align-items: center;
+      }
+
+      .menu-row-name {
+        font-size: 20px;
+        width: 100%;
       }
 
       .menu-row-leader {
@@ -1458,10 +1572,14 @@
 
       .menu-row-price {
         margin-left: auto;
+        font-size: 19px;
       }
 
-      .menu-row-name {
-        font-size: 21px;
+      .menu-row-desc {
+        font-size: 16px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dotted rgba(216, 199, 174, 0.18);
       }
     }
 
@@ -1714,6 +1832,12 @@
     .call-alt a:hover {
       color: var(--off-white);
       border-color: var(--off-white);
+    }
+
+    @media (max-width: 1200px) and (min-width: 901px) {
+      .reservas-grid {
+        gap: 56px;
+      }
     }
 
     @media (max-width: 900px) {
@@ -2112,6 +2236,12 @@
       min-width: 0;
     }
 
+    .admin-add-btn {
+      margin-top: 14px;
+      width: 100%;
+      padding: 12px;
+    }
+
     .admin-toggle {
       display: inline-flex;
       align-items: center;
@@ -2173,14 +2303,102 @@
       width: 180px;
     }
 
+    /* ── Admin notebook/tablet: lista de cardápios vira faixa horizontal ── */
     @media (max-width: 900px) {
       .admin-layout {
         grid-template-columns: 1fr;
-        gap: 28px;
+        gap: 24px;
       }
 
       .admin-side {
         position: static;
+        display: flex;
+        align-items: stretch;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .admin-side>.admin-side-title {
+        display: none;
+      }
+
+      .admin-menu-btn {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 190px;
+        margin-bottom: 0;
+      }
+
+      .admin-add-btn {
+        flex: 0 0 auto;
+        width: auto;
+        margin-top: 0;
+        padding: 12px 18px;
+        white-space: nowrap;
+        align-self: center;
+      }
+    }
+
+    /* ── Admin mobile: pratos em cards, ações empilhadas ── */
+    @media (max-width: 700px) {
+      .admin-page {
+        padding: 88px 0 80px;
+      }
+
+      .admin-actions {
+        width: 100%;
+      }
+
+      .admin-actions .btn {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+
+      .admin-items-list {
+        border-top: none;
+        display: grid;
+        gap: 12px;
+      }
+
+      .admin-item-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-left: 2px solid rgba(138, 106, 68, 0.55);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .admin-item-info {
+        min-width: 0;
+      }
+
+      .admin-item-price {
+        min-width: 0;
+        padding-top: 0;
+      }
+
+      .admin-item-actions {
+        padding-top: 6px;
+        width: 100%;
+      }
+
+      .admin-item-actions .btn {
+        flex: 1;
+        text-align: center;
+      }
+
+      .admin-cat-add {
+        width: 100%;
+      }
+
+      .admin-cat-add input {
+        flex: 1;
+        width: auto;
       }
     }
 
