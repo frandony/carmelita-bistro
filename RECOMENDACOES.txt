@@ -57,3 +57,126 @@ DICAS PARA O ENSAIO DE FOTOS (quando acontecer)
 - Foto na horizontal (paisagem) para a faixa de destaques;
 - Prato finalizado como sai para o cliente, sem retoques exagerados;
 - 5 ou 6 fotos boas valem mais que 30 medianas.
+
+
+=====================================================================
+ANÁLISE VISUAL E LEGIBILIDADE — PARA TODAS AS IDADES
+=====================================================================
+
+O QUE JÁ ESTÁ BOM
+-----------------
+- CONTRASTE do conteúdo principal é confortável: o bege areia
+  (#D8C7AE) e o off-white (#F4F0EA) sobre o fundo preto (#111) têm
+  contraste alto, bem acima do mínimo recomendado (WCAG). Títulos e
+  textos de leitura passam com folga.
+- PALETA COESA: preto vintage + dourado/bronze + azul de apoio se
+  repetem em todas as páginas; nada destoa. O azul aparece sempre com
+  o mesmo papel (interação/apoio), o que cria consistência.
+- HIERARQUIA CLARA: título grande da seção → subtítulo → conteúdo.
+  Os "eyebrows" numerados (01 /, 02 /...) ajudam a escanear a página.
+- LINGUAGEM: os textos são curtos, calorosos e sem jargão — uma pessoa
+  de qualquer idade entende "Reservas somente por ligação" e acha o
+  telefone em qualquer página (nav, reservas, rodapé).
+
+PONTOS DE ATENÇÃO (principalmente para pessoas mais velhas
+ou com baixa visão) — sugestões, aplicar se o cliente aprovar
+-------------------------------------------------------------
+1) TEXTOS FUNCIONAIS PEQUENOS E APAGADOS DEMAIS
+   Alguns textos que carregam INFORMAÇÃO (não decoração) estão em
+   10–11px com opacidade 35–55%:
+   - faixa inferior da hero ("Qui a Dom · Reservas por ligação");
+   - rodapé inferior (direitos/creditos — ok ser discreto);
+   - legendas dos quadros da galeria (ph-meta, 10px a 35%).
+   Sugestão: para informação útil (horário, telefone), mínimo de
+   12–13px e opacidade 0.65+. Decoração pode continuar discreta.
+
+2) MAIÚSCULAS COM ESPAÇAMENTO LARGO EM TAMANHO PEQUENO
+   O estilo "OSWALD MAIÚSCULA COM LETTER-SPACING 0.3em" é bonito e
+   identitário, mas em 9–11px vira um teste de visão. Onde for
+   informação essencial, preferir 12px+ ou reduzir o espaçamento.
+
+3) "CONSULTAR" NO CARDÁPIO ESTÁ COM 55% DE OPACIDADE
+   É a única "informação de preço" que o cliente tem — merece mais
+   presença (opacidade 0.75+), mesmo mantendo o itálico elegante.
+
+4) NAVEGAÇÃO POR TECLADO INVISÍVEL
+   Botões e links não têm estilo de :focus-visible — quem navega por
+   teclado (acessibilidade) não vê onde está. Sugestão: outline fino
+   dourado ou azul no foco. Mudança pequena, sem impacto visual para
+   quem usa mouse/touch.
+
+5) SEM prefers-reduced-motion
+   As animações (reveal, glow, draw da logo) não são desligadas para
+   quem configura o sistema para reduzir movimento (comum em pessoas
+   com enjoo/vestibulopatia). Sugestão: um bloco
+   @media (prefers-reduced-motion: reduce) desativando transições.
+
+6) FONTE DAS DESCRIÇÕES (Cormorant Garamond) É FINA
+   Em telas comuns fica elegante; em telas ruins/brilho baixo pode
+   "sumir". Se alguém reclamar, subir o weight de 400 para 500 nas
+   descrições resolve sem mudar o design.
+
+VEREDITO VISUAL
+---------------
+O site está bonito e coerente com a proposta "dark luxury" — hero
+impactante, seções bem ritmadas, rodapé completo. Os ajustes acima
+são refinamentos de acessibilidade, não correções de design.
+
+
+=====================================================================
+ANÁLISE DO CARDÁPIO (EXIBIÇÃO) — COESÃO E ESTRUTURA
+=====================================================================
+
+O QUE JÁ ESTÁ BOM
+-----------------
+- ESTRUTURA DE REFEIÇÃO CLÁSSICA: Entradas → Massas & Risotos →
+  Principais → Sobremesas. É a ordem que qualquer pessoa espera ler.
+- O SELETOR DE DOIS CARDÁPIOS espelha o funcionamento real da casa
+  (Jantar Qui/Sex · Almoço Sáb/Dom) — o visitante entende na hora
+  o que é servido em cada dia, sem precisar ligar para perguntar.
+- A LINHA PONTILHADA nome→preço guia o olho como um menu impresso;
+  no mobile os cards resolvem bem a leitura em tela estreita.
+- DESCRIÇÕES no tom da casa (curtas, apetitosas, sem tecnicismo).
+
+PONTOS DE COESÃO A MELHORAR (dependem de informação do Gastão)
+--------------------------------------------------------------
+1) SEÇÕES MAGRAS DESEQUILIBRAM A PÁGINA
+   "Pratos Principais" tem 1 item (Hambúrguer) e "Sobremesas" tem 1
+   (Mousse), enquanto Entradas tem 4. Visualmente fica assimétrico.
+   Opções: (a) completar com pratos reais que os clientes já citaram
+   em avaliações — nhoque e carpaccio aparecem em reviews — depois de
+   confirmar com o Gastão; ou (b) fundir "Principais" em "Massas &
+   Risotos" virando "Pratos da Casa".
+
+2) "BRASILEIRINHO" SEM DESCRIÇÃO
+   É o único prato do site inteiro sem descrição (o story não trazia).
+   Pedir 1 linha ao Gastão — não inventar.
+
+3) ETIQUETAS SEM PADRÃO
+   Hoje existem 4 tipos: "Casa", "Autoral", "Prato da casa" e
+   "Sáb & Dom". "Casa" e "Prato da casa" parecem a mesma coisa.
+   Sugestão de padronizar em no máximo 3 com significado claro:
+   - "Autoral"      → criação exclusiva do chef
+   - "Prato da casa"→ o carro-chefe (1 por cardápio, no máximo)
+   - "Sáb & Dom"    → só no fim de semana
+   ("Casa" seria absorvida por uma das duas primeiras.)
+
+4) TODOS OS PREÇOS EM "CONSULTAR"
+   Entendo a flexibilidade, mas: a faixa de preço da casa já é
+   pública na internet (R$ 80–100 por pessoa no Restaurant Guru).
+   Preço no cardápio aumenta a conversão (o cliente decide sem
+   precisar ligar) e evita ligações só para perguntar valor.
+   Sugestão: publicar ao menos os preços dos pratos fixos; manter
+   "Consultar" apenas para o que muda com o mercado (camarão etc.).
+   O painel admin já suporta preencher preço por prato.
+
+5) PADRÃO DAS DESCRIÇÕES
+   Manter todas com 1–2 linhas, iniciando com o ingrediente/preparo
+   principal e terminando com ponto final (hoje quase todas seguem
+   isso — só manter a disciplina ao adicionar pratos novos).
+
+VEREDITO DO CARDÁPIO
+--------------------
+A estrutura está sólida e coesa — o que falta é CONTEÚDO da casa
+(descrição do Brasileirinho, mais pratos reais, preços) e uma
+padronização leve das etiquetas. Nenhuma mudança de design necessária.
