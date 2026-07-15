@@ -1,0 +1,59 @@
+RECOMENDAÇÕES — SITE CARMELITA RESTÔ
+=====================================
+
+FOTOS NO CARDÁPIO: POR ENQUANTO, NÃO
+------------------------------------
+
+Recomendação atual: manter o cardápio SEM fotos, em lista elegante
+(nome, descrição, preço). Motivos:
+
+1) NÃO EXISTEM FOTOS BOAS DISPONÍVEIS
+   Não foi possível baixar fotos do Instagram/TripAdvisor, e os prints
+   dos stories são verticais, com texto por cima e qualidade baixa.
+   Foto ruim de comida é pior que nenhuma foto — mata o apetite em vez
+   de abrir.
+
+2) O ESTILO DA CASA FAVORECE TEXTO
+   O visual "dark luxury" com tipografia serifada funciona como um menu
+   impresso de bistrô — formato que restaurantes sofisticados usam de
+   propósito, porque passa confiança na cozinha. Uma grade de fotos
+   empurra a percepção para o lado de app de delivery, o oposto do
+   posicionamento "cozinha autoral, arte na mesa".
+
+3) O LADO TÉCNICO COMPLICA PARA O CLIENTE LEIGO
+   O site é estático e o painel admin salva no navegador. Texto viaja
+   bem no arquivo menu.json que a casa baixa e envia ao desenvolvedor.
+   Foto, não: ou viraria um texto gigante embutido no arquivo (pesado e
+   frágil), ou cada foto precisaria ser enviada separadamente para
+   entrar no projeto — ou seja, o "adicionar foto" do admin nunca seria
+   realmente autônomo para o Gastão e a Fernanda.
+
+QUANDO MUDAR DE IDEIA
+---------------------
+
+Se o Gastão fizer um ensaio de fotos dos pratos (mesmo 5–6 fotos boas,
+com luz de dia), aí vale — mas do jeito certo:
+
+- NÃO colocar uma foto por prato na lista;
+- SIM criar uma FAIXA DE DESTAQUES no topo do cardápio: 3 ou 4 pratos-
+  assinatura com foto grande e bonita (ex.: Risoto Caprese, Feijoada
+  da Fê, Coxinha de Banana da Terra com Rabada), mantendo a lista
+  elegante em texto logo abaixo.
+
+Como implementar quando houver material:
+- As fotos entram no projeto como arquivos na pasta assets/ (enviadas
+  ao desenvolvedor uma única vez);
+- No cardápio (menu.json), cada prato pode ganhar um campo opcional
+  "img" com o nome do arquivo (ex.: "img": "risoto-caprese.jpg");
+- No admin, o prato destacado teria apenas um campo simples "foto do
+  destaque", escolhendo entre as fotos já enviadas;
+- Pratos sem foto continuam aparecendo normalmente na lista — o campo
+  é opcional e invisível enquanto não houver foto.
+
+DICAS PARA O ENSAIO DE FOTOS (quando acontecer)
+-----------------------------------------------
+- Luz natural de dia (perto da janela), sem flash;
+- Fundo neutro: a mesa de madeira escura da casa funciona bem;
+- Foto na horizontal (paisagem) para a faixa de destaques;
+- Prato finalizado como sai para o cliente, sem retoques exagerados;
+- 5 ou 6 fotos boas valem mais que 30 medianas.
