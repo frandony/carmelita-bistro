@@ -648,12 +648,13 @@ function Admin() {
 
   const [data, setData]   = useState(loadMenusData);
   const [selId, setSelId] = useState(null);
-  const sel = data.menus.find(m => m.id === selId) || data.menus[0] || null;
+  const [view, setView]   = useState("list"); // "list" = escolher cardápio · "edit" = editar cardápio
+  const sel = data.menus.find(m => m.id === selId) || null;
 
   const [editItem, setEditItem]     = useState(null);
   const [editForm, setEditForm]     = useState({});
-  const [addingItem, setAddingItem] = useState(false);
-  const [newItem, setNewItem]       = useState({ cat: "", name: "", desc: "", price: "", tag: "" });
+  const [addingCat, setAddingCat]   = useState(null); // id da categoria onde está adicionando prato
+  const [newItem, setNewItem]       = useState({ name: "", desc: "", price: "", tag: "" });
   const [newCat, setNewCat]         = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
   const importRef = useRef(null);
@@ -678,10 +679,17 @@ function Admin() {
     else setPassErr(true);
   };
 
-  const selectMenu = (id) => {
+  const openMenu = (id) => {
     setSelId(id);
+    setView("edit");
     setEditItem(null);
-    setAddingItem(false);
+    setAddingCat(null);
+  };
+
+  const backToList = () => {
+    setView("list");
+    setEditItem(null);
+    setAddingCat(null);
   };
 
   // ── Operações de cardápio ──
@@ -694,21 +702,21 @@ function Admin() {
       id: nid, name: "Novo cardápio", subtitle: "", public: false,
       categories: [{ id: "pratos", label: "Pratos" }], items: [],
     }] }));
-    selectMenu(nid);
+    openMenu(nid);
   };
 
   const duplicateMenu = () => {
     const nid = "m_" + Date.now();
     setData(d => ({ menus: [...d.menus, { ...sel, id: nid, name: sel.name + " (cópia)", public: false }] }));
-    selectMenu(nid);
+    openMenu(nid);
   };
 
   const deleteMenu = () => {
-    if (data.menus.length <= 1) { alert("Não é possível excluir o único cardápio."); return; }
-    if (!confirm(`Excluir o cardápio "${sel.name}"?`)) return;
+    if (data.menus.length <= 1) { alert("Este é o único cardápio — não dá para apagá-lo."); return; }
+    if (!confirm(`Apagar o cardápio "${sel.name}"?\n\nEssa ação não pode ser desfeita.`)) return;
     const remaining = data.menus.filter(m => m.id !== sel.id);
     setData({ menus: remaining });
-    selectMenu(remaining[0].id);
+    backToList();
   };
 
   // ── Categorias ──
@@ -722,27 +730,41 @@ function Admin() {
   };
 
   const removeCategory = (id) => {
-    const emptied = sel.items.some(it => it.cat === id);
-    if (emptied && !confirm("Há pratos nesta categoria. Eles ficarão em \"Outros pratos\" até serem reclassificados. Remover mesmo assim?")) return;
+    const hasItems = sel.items.some(it => it.cat === id);
+    if (hasItems && !confirm("Ainda existem pratos nesta seção. Eles vão aparecer em \"Outros pratos\" até você movê-los.\n\nApagar a seção mesmo assim?")) return;
     updateSel({ categories: sel.categories.filter(c => c.id !== id) });
   };
 
   // ── Pratos ──
-  const removeItem = (idx) =>
+  const removeItem = (idx) => {
+    const it = sel.items[idx];
+    if (!confirm(`Remover o prato "${it.name}" deste cardápio?`)) return;
     updateSel({ items: sel.items.filter((_, i) => i !== idx) });
+  };
 
-  const startEditItem = (idx) => { setEditItem(idx); setEditForm({ ...sel.items[idx] }); };
+  const startEditItem = (idx) => {
+    setEditItem(idx);
+    setEditForm({ ...sel.items[idx] });
+    setAddingCat(null);
+  };
 
   const saveEditItem = () => {
+    if (!(editForm.name || "").trim()) { alert("O prato precisa de um nome."); return; }
     updateSel({ items: sel.items.map((it, i) => i === editItem ? { ...editForm } : it) });
     setEditItem(null);
   };
 
-  const addItem = () => {
-    if (!newItem.name.trim() || !newItem.cat) return;
-    updateSel({ items: [...sel.items, { ...newItem }] });
-    setNewItem({ cat: "", name: "", desc: "", price: "", tag: "" });
-    setAddingItem(false);
+  const startAddItem = (catId) => {
+    setAddingCat(catId);
+    setNewItem({ name: "", desc: "", price: "", tag: "" });
+    setEditItem(null);
+  };
+
+  const saveNewItem = () => {
+    if (!newItem.name.trim()) { alert("Escreva pelo menos o nome do prato."); return; }
+    updateSel({ items: [...sel.items, { cat: addingCat, ...newItem }] });
+    setNewItem({ name: "", desc: "", price: "", tag: "" });
+    setAddingCat(null);
   };
 
   // ── Exportar / Importar / Restaurar ──
@@ -765,25 +787,34 @@ function Admin() {
         const d = normalizeMenus(JSON.parse(reader.result));
         if (!d) throw new Error();
         setData(d);
-        selectMenu(d.menus[0] && d.menus[0].id);
-      } catch { alert("Arquivo inválido — esperado um menu.json exportado por este painel."); }
+        backToList();
+        alert("Arquivo carregado com sucesso!");
+      } catch { alert("Este arquivo não parece ser um cardápio válido.\nUse um arquivo baixado pelo botão \"Baixar arquivo do cardápio\"."); }
     };
     reader.readAsText(file);
     e.target.value = "";
   };
 
   const resetDefault = () => {
-    if (!confirm("Descartar as alterações deste navegador e voltar ao cardápio publicado no site?")) return;
+    if (!confirm("Descartar TODAS as mudanças feitas neste computador e voltar ao cardápio que está publicado no site?")) return;
     localStorage.removeItem(DATA_KEY);
-    const d = defaultMenusData();
-    setData(d);
-    selectMenu(d.menus[0] && d.menus[0].id);
+    setData(defaultMenusData());
+    backToList();
   };
-
-  const catLabel = (id) => (sel.categories.find(c => c.id === id) || {}).label || "Sem categoria";
 
   const ef = (k) => (e) => setEditForm(f => ({ ...f, [k]: e.target.value }));
   const nf = (k) => (e) => setNewItem(f => ({ ...f, [k]: e.target.value }));
+
+  // Pratos agrupados por categoria (mantendo o índice original de cada prato)
+  const grouped = sel ? (() => {
+    const withIdx = sel.items.map((it, idx) => ({ it, idx }));
+    const cats = sel.categories.filter(c => c.id !== "all");
+    const known = new Set(cats.map(c => c.id));
+    const groups = cats.map(c => ({ cat: c, entries: withIdx.filter(x => x.it.cat === c.id) }));
+    const orphans = withIdx.filter(x => !known.has(x.it.cat));
+    if (orphans.length) groups.push({ cat: { id: "_outros", label: "Outros pratos" }, entries: orphans });
+    return groups;
+  })() : [];
 
   if (!authed) {
     return (
@@ -807,224 +838,246 @@ function Admin() {
     );
   }
 
+  // ─────────────── TELA 1 · Meus cardápios ───────────────
+  if (view === "list" || !sel) {
+    return (
+      <div className="page page-enter">
+        <div className="admin-page container">
+
+          <div className="adm-head">
+            <div>
+              <div className="block-eyebrow" style={{ marginBottom: 8 }}>Área da casa</div>
+              <h1 className="block-title" style={{ margin: 0 }}>Meus <em>cardápios</em>.</h1>
+            </div>
+            <span className="adm-status">{saveStatus === "saving" ? "Guardando…" : "✓ Tudo guardado"}</span>
+          </div>
+
+          <div className="adm-help">
+            <strong>Como funciona:</strong> toque em <em>Editar</em> no cardápio que você quer mexer.
+            Quando terminar, use o quadro <em>Publicar no site</em>, no fim desta página.
+          </div>
+
+          <div className="adm-grid">
+            {data.menus.map(m => (
+              <div key={m.id} className="adm-card">
+                <span className={"adm-badge" + (m.public !== false ? " on" : " off")}>
+                  {m.public !== false ? "● Aparece no site" : "○ Escondido do site"}
+                </span>
+                <div className="adm-card-name">{m.name}</div>
+                {m.subtitle ? <div className="adm-card-sub">{m.subtitle}</div> : null}
+                <div className="adm-card-count">{m.items.length} {m.items.length === 1 ? "prato" : "pratos"}</div>
+                <button className="adm-btn adm-btn-gold" onClick={() => openMenu(m.id)}>✏️ Editar este cardápio</button>
+              </div>
+            ))}
+            <button className="adm-card adm-card-new" onClick={addMenu}>
+              <span className="adm-card-new-plus">+</span>
+              <span>Criar novo cardápio</span>
+            </button>
+          </div>
+
+          <div className="adm-publish">
+            <div className="adm-publish-title">🌐 Publicar no site</div>
+            <p>
+              O que você edita aqui fica guardado <strong>somente neste computador</strong>.
+              Para o site mudar para todos os clientes: baixe o arquivo do cardápio no botão
+              abaixo e envie para o desenvolvedor.
+            </p>
+            <button className="adm-btn adm-btn-gold" onClick={exportJson}>⬇️ Baixar arquivo do cardápio</button>
+
+            <details className="adm-advanced">
+              <summary>Opções avançadas</summary>
+              <div className="adm-advanced-row">
+                <button className="adm-btn adm-btn-line" onClick={() => importRef.current && importRef.current.click()}>
+                  Carregar um arquivo de cardápio
+                </button>
+                <button className="adm-btn adm-btn-line adm-btn-danger" onClick={resetDefault}>
+                  Desfazer tudo e voltar ao cardápio do site
+                </button>
+              </div>
+              <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importJson} />
+            </details>
+          </div>
+
+          <div style={{ marginTop: 28 }}>
+            <a className="adm-btn adm-btn-line" href="#home">← Voltar para o site</a>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
+
+  // ─────────────── TELA 2 · Editando um cardápio ───────────────
   return (
     <div className="page page-enter">
       <div className="admin-page container">
 
-        {/* ── Cabeçalho ── */}
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 24 }}>
-          <div>
-            <div className="block-eyebrow" style={{ marginBottom: 8 }}>Gestão do Cardápio</div>
-            <h1 className="block-title" style={{ margin: 0 }}>Painel <em>Admin</em>.</h1>
-          </div>
-          <div className="admin-actions" style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <span className="admin-autosave-status">
-              {saveStatus === "saving" ? "Salvando…" : "Salvo neste navegador ✓"}
-            </span>
-            <button className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={exportJson}>
-              Baixar menu.json
-            </button>
-            <button className="btn btn-ghost" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={() => importRef.current && importRef.current.click()}>
-              Importar
-            </button>
-            <button className="btn btn-ghost" style={{ padding: "10px 20px", fontSize: "0.8rem", opacity: 0.55 }} onClick={resetDefault}>
-              Restaurar padrão
-            </button>
-            <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importJson} />
-          </div>
+        <div className="adm-head">
+          <button className="adm-back" onClick={backToList}>← Voltar aos cardápios</button>
+          <span className="adm-status">{saveStatus === "saving" ? "Guardando…" : "✓ Tudo guardado"}</span>
         </div>
 
-        <p className="admin-notice">
-          As alterações valem <strong>apenas neste navegador</strong>. Para publicar no site para todo mundo,
-          clique em <code>Baixar menu.json</code> e substitua o arquivo <code>menu.json</code> do projeto (ou envie ao desenvolvedor).
+        <h1 className="block-title" style={{ margin: "0 0 6px" }}>{sel.name}</h1>
+        <p className="adm-help" style={{ marginBottom: 34 }}>
+          Tudo o que você mudar aqui é guardado sozinho — não precisa apertar nenhum botão de salvar.
         </p>
 
-        {/* ── Lista + Editor ── */}
-        <div className="admin-layout">
-          <aside className="admin-side">
-            <div className="admin-side-title">Cardápios</div>
-            {data.menus.map(m => (
-              <button key={m.id}
-                      className={"admin-menu-btn" + (sel && m.id === sel.id ? " sel" : "")}
-                      onClick={() => selectMenu(m.id)}>
-                <span className="amb-name">{m.name}</span>
-                <span className="amb-meta">
-                  {m.items.length} {m.items.length === 1 ? "prato" : "pratos"}
-                  <span className={m.public !== false ? "amb-public" : "amb-hidden"}>
-                    {m.public !== false ? " · visível no site" : " · oculto"}
-                  </span>
-                </span>
-              </button>
-            ))}
-            <button className="btn btn-ghost admin-add-btn" onClick={addMenu}>
-              + Novo cardápio
-            </button>
-          </aside>
+        {/* ── Passo 1: informações ── */}
+        <div className="adm-box">
+          <div className="adm-box-title">1 · Informações do cardápio</div>
+          <div className="admin-form-grid">
+            <div className="form-field">
+              <label>Nome do cardápio</label>
+              <input type="text" value={sel.name} onChange={e => updateSel({ name: e.target.value })} />
+              <span className="adm-hint">Ex.: Jantar · Almoço de Fim de Semana</span>
+            </div>
+            <div className="form-field">
+              <label>Dias e horário</label>
+              <input type="text" value={sel.subtitle || ""} placeholder="Ex.: Sábado & Domingo · 12h às 16h"
+                     onChange={e => updateSel({ subtitle: e.target.value })} />
+              <span className="adm-hint">Aparece embaixo do nome, no site</span>
+            </div>
+          </div>
 
-          <div className="admin-editor">
-            {!sel ? (
-              <p style={{ opacity: 0.45, fontStyle: "italic" }}>Nenhum cardápio — crie um ao lado.</p>
-            ) : (
-              <>
-                {/* Identidade do cardápio */}
-                <div className="admin-edit-form" style={{ marginBottom: 28 }}>
-                  <div className="admin-form-grid">
-                    <div className="form-field">
-                      <label>Nome do cardápio</label>
-                      <input type="text" value={sel.name} onChange={e => updateSel({ name: e.target.value })} />
-                    </div>
-                    <div className="form-field">
-                      <label>Subtítulo (dias e horário)</label>
-                      <input type="text" value={sel.subtitle || ""} placeholder="Ex: Sábado & Domingo · 12h às 16h"
-                             onChange={e => updateSel({ subtitle: e.target.value })} />
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginTop: 16 }}>
-                    <label className="admin-toggle">
-                      <input type="checkbox" checked={sel.public !== false}
-                             onChange={e => updateSel({ public: e.target.checked })} />
-                      <span>Visível no site</span>
-                    </label>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem" }} onClick={duplicateMenu}>Duplicar</button>
-                      {data.menus.length > 1 && (
-                        <button className="btn btn-ghost" style={{ padding: "7px 14px", fontSize: "0.85rem", opacity: 0.5 }} onClick={deleteMenu}>Excluir</button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+          <label className="adm-switch-row">
+            <span className="adm-switch">
+              <input type="checkbox" checked={sel.public !== false}
+                     onChange={e => updateSel({ public: e.target.checked })} />
+              <span className="adm-switch-slider"></span>
+            </span>
+            <span className="adm-switch-label">
+              {sel.public !== false
+                ? <>Este cardápio <strong className="on">está aparecendo</strong> no site</>
+                : <>Este cardápio <strong className="off">está escondido</strong> do site</>}
+            </span>
+          </label>
+        </div>
 
-                {/* Categorias */}
-                <div style={{ marginBottom: 28 }}>
-                  <div className="admin-side-title" style={{ marginBottom: 12 }}>Categorias</div>
-                  <div className="admin-cats">
-                    {sel.categories.filter(c => c.id !== "all").map(c => (
-                      <span key={c.id} className="admin-cat-chip">
-                        {c.label}
-                        <button onClick={() => removeCategory(c.id)} aria-label={`Remover ${c.label}`}>×</button>
-                      </span>
-                    ))}
-                    <span className="admin-cat-add">
-                      <input type="text" value={newCat} placeholder="Nova categoria…"
-                             onChange={e => setNewCat(e.target.value)}
-                             onKeyDown={e => { if (e.key === "Enter") addCategory(); }} />
-                      <button className="btn btn-ghost" style={{ padding: "6px 12px", fontSize: "0.8rem" }} onClick={addCategory}>Adicionar</button>
-                    </span>
-                  </div>
-                </div>
+        {/* ── Passo 2: pratos, agrupados por seção ── */}
+        <div className="adm-box">
+          <div className="adm-box-title">2 · Pratos</div>
 
-                {/* Pratos */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 16 }}>
-                  <div className="admin-side-title" style={{ margin: 0 }}>Pratos</div>
-                  <button className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.8rem" }} onClick={() => setAddingItem(true)}>
-                    + Adicionar prato
-                  </button>
-                </div>
+          {grouped.map(g => (
+            <div key={g.cat.id} className="adm-cat">
+              <div className="adm-cat-head">
+                <h3 className="adm-cat-title">{g.cat.label}</h3>
+                {g.cat.id !== "_outros" && (
+                  <button className="adm-x" title="Apagar esta seção" onClick={() => removeCategory(g.cat.id)}>×</button>
+                )}
+              </div>
 
-                {addingItem && (
-                  <div className="admin-edit-form">
-                    <h3 style={{ marginBottom: 16, fontSize: "1.1rem" }}>Novo prato</h3>
+              {g.entries.length === 0 && addingCat !== g.cat.id && (
+                <p className="adm-empty">Nenhum prato aqui ainda.</p>
+              )}
+
+              {g.entries.map(({ it, idx }) => (
+                editItem === idx ? (
+                  <div key={idx} className="adm-dish-form">
+                    <div className="adm-dish-form-title">Editando "{it.name}"</div>
                     <div className="admin-form-grid">
                       <div className="form-field">
-                        <label>Categoria</label>
-                        <select value={newItem.cat} onChange={nf("cat")}>
-                          <option value="">— escolher —</option>
+                        <label>Nome do prato</label>
+                        <input type="text" value={editForm.name} onChange={ef("name")} />
+                      </div>
+                      <div className="form-field">
+                        <label>Preço (só o número)</label>
+                        <input type="text" value={editForm.price} onChange={ef("price")} placeholder="Deixe vazio para mostrar Consultar" />
+                      </div>
+                      <div className="form-field" style={{ gridColumn: "1 / -1" }}>
+                        <label>Descrição (opcional)</label>
+                        <textarea value={editForm.desc} onChange={ef("desc")} rows={2} />
+                      </div>
+                      <div className="form-field">
+                        <label>Etiqueta (opcional)</label>
+                        <input type="text" value={editForm.tag || ""} onChange={ef("tag")} placeholder="Ex.: Autoral, Sáb & Dom" />
+                      </div>
+                      <div className="form-field">
+                        <label>Seção onde aparece</label>
+                        <select value={editForm.cat} onChange={ef("cat")}>
                           {sel.categories.filter(c => c.id !== "all").map(c => (
                             <option key={c.id} value={c.id}>{c.label}</option>
                           ))}
                         </select>
                       </div>
-                      <div className="form-field">
-                        <label>Nome do prato</label>
-                        <input type="text" value={newItem.name} onChange={nf("name")} placeholder="Ex: Risoto de Camarão" />
-                      </div>
-                      <div className="form-field" style={{ gridColumn: "1 / -1" }}>
-                        <label>Descrição</label>
-                        <textarea value={newItem.desc} onChange={nf("desc")} rows={2} placeholder="Ingredientes e preparo…" />
-                      </div>
-                      <div className="form-field">
-                        <label>Preço (R$) — vazio = "Consultar"</label>
-                        <input type="text" value={newItem.price} onChange={nf("price")} placeholder="Ex: 58" />
-                      </div>
-                      <div className="form-field">
-                        <label>Tag (opcional)</label>
-                        <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex: Autoral, Casa, Sáb & Dom" />
-                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                      <button className="btn btn-primary" onClick={addItem}>Adicionar</button>
-                      <button className="btn btn-ghost" onClick={() => setAddingItem(false)}>Cancelar</button>
+                    <div className="adm-form-btns">
+                      <button className="adm-btn adm-btn-gold" onClick={saveEditItem}>✓ Salvar prato</button>
+                      <button className="adm-btn adm-btn-line" onClick={() => setEditItem(null)}>Cancelar</button>
                     </div>
                   </div>
-                )}
-
-                {sel.items.length === 0 && !addingItem && (
-                  <p style={{ opacity: 0.45, fontStyle: "italic", padding: "24px 0" }}>
-                    Nenhum prato neste cardápio. Clique em "+ Adicionar prato" para começar.
-                  </p>
-                )}
-
-                <div className="admin-items-list">
-                  {sel.items.map((it, idx) => (
-                    <div key={idx} className="admin-item-row">
-                      {editItem === idx ? (
-                        <div className="admin-edit-form" style={{ width: "100%" }}>
-                          <div className="admin-form-grid">
-                            <div className="form-field">
-                              <label>Categoria</label>
-                              <select value={editForm.cat} onChange={ef("cat")}>
-                                {sel.categories.filter(c => c.id !== "all").map(c => (
-                                  <option key={c.id} value={c.id}>{c.label}</option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="form-field">
-                              <label>Nome</label>
-                              <input type="text" value={editForm.name} onChange={ef("name")} />
-                            </div>
-                            <div className="form-field" style={{ gridColumn: "1 / -1" }}>
-                              <label>Descrição</label>
-                              <textarea value={editForm.desc} onChange={ef("desc")} rows={2} />
-                            </div>
-                            <div className="form-field">
-                              <label>Preço (vazio = Consultar)</label>
-                              <input type="text" value={editForm.price} onChange={ef("price")} />
-                            </div>
-                            <div className="form-field">
-                              <label>Tag</label>
-                              <input type="text" value={editForm.tag || ""} onChange={ef("tag")} />
-                            </div>
-                          </div>
-                          <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
-                            <button className="btn btn-primary" onClick={saveEditItem}>Salvar</button>
-                            <button className="btn btn-ghost" onClick={() => setEditItem(null)}>Cancelar</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="admin-item-info">
-                            <span className="menu-item-tag" style={{ marginBottom: 4, display: "inline-block" }}>
-                              {catLabel(it.cat)}
-                            </span>
-                            <strong style={{ display: "block", fontSize: "1.05rem" }}>{it.name}</strong>
-                            <span style={{ opacity: 0.6, fontSize: "0.9rem" }}>{it.desc}</span>
-                          </div>
-                          <div className="admin-item-price">
-                            {it.price ? `R$ ${it.price}` : <span className="price-tba">Consultar</span>}
-                            {it.tag && <span className="menu-item-tag" style={{ marginLeft: 8 }}>{it.tag}</span>}
-                          </div>
-                          <div className="admin-item-actions">
-                            <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem" }} onClick={() => startEditItem(idx)}>Editar</button>
-                            <button className="btn btn-ghost" style={{ padding: "6px 14px", fontSize: "0.85rem", opacity: 0.5 }} onClick={() => removeItem(idx)}>Remover</button>
-                          </div>
-                        </>
-                      )}
+                ) : (
+                  <div key={idx} className="adm-dish">
+                    <div className="adm-dish-info">
+                      <div className="adm-dish-name">
+                        {it.name}
+                        {it.tag ? <span className="menu-item-tag" style={{ marginLeft: 10 }}>{it.tag}</span> : null}
+                      </div>
+                      {it.desc ? <div className="adm-dish-desc">{it.desc}</div> : null}
                     </div>
-                  ))}
+                    <div className="adm-dish-price">{it.price ? `R$ ${it.price}` : "Consultar"}</div>
+                    <div className="adm-dish-actions">
+                      <button className="adm-btn adm-btn-line" onClick={() => startEditItem(idx)}>Editar</button>
+                      <button className="adm-btn adm-btn-line adm-btn-danger" onClick={() => removeItem(idx)}>Remover</button>
+                    </div>
+                  </div>
+                )
+              ))}
+
+              {addingCat === g.cat.id ? (
+                <div className="adm-dish-form">
+                  <div className="adm-dish-form-title">Novo prato em "{g.cat.label}"</div>
+                  <div className="admin-form-grid">
+                    <div className="form-field">
+                      <label>Nome do prato</label>
+                      <input type="text" value={newItem.name} onChange={nf("name")} placeholder="Ex.: Risoto de Camarão" autoFocus />
+                    </div>
+                    <div className="form-field">
+                      <label>Preço (só o número)</label>
+                      <input type="text" value={newItem.price} onChange={nf("price")} placeholder="Deixe vazio para mostrar Consultar" />
+                    </div>
+                    <div className="form-field" style={{ gridColumn: "1 / -1" }}>
+                      <label>Descrição (opcional)</label>
+                      <textarea value={newItem.desc} onChange={nf("desc")} rows={2} placeholder="Ingredientes, acompanhamentos…" />
+                    </div>
+                    <div className="form-field">
+                      <label>Etiqueta (opcional)</label>
+                      <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex.: Autoral, Sáb & Dom" />
+                    </div>
+                  </div>
+                  <div className="adm-form-btns">
+                    <button className="adm-btn adm-btn-gold" onClick={saveNewItem}>✓ Adicionar prato</button>
+                    <button className="adm-btn adm-btn-line" onClick={() => setAddingCat(null)}>Cancelar</button>
+                  </div>
                 </div>
-              </>
-            )}
+              ) : (
+                g.cat.id !== "_outros" && (
+                  <button className="adm-add-dish" onClick={() => startAddItem(g.cat.id)}>
+                    + Adicionar prato em "{g.cat.label}"
+                  </button>
+                )
+              )}
+            </div>
+          ))}
+
+          <div className="adm-new-cat">
+            <input type="text" value={newCat} placeholder="Nome da nova seção (ex.: Bebidas)"
+                   onChange={e => setNewCat(e.target.value)}
+                   onKeyDown={e => { if (e.key === "Enter") addCategory(); }} />
+            <button className="adm-btn adm-btn-line" onClick={addCategory}>+ Criar seção</button>
           </div>
+        </div>
+
+        {/* ── Mais opções ── */}
+        <details className="adm-advanced">
+          <summary>Mais opções deste cardápio</summary>
+          <div className="adm-advanced-row">
+            <button className="adm-btn adm-btn-line" onClick={duplicateMenu}>Fazer uma cópia deste cardápio</button>
+            <button className="adm-btn adm-btn-line adm-btn-danger" onClick={deleteMenu}>Apagar este cardápio</button>
+          </div>
+        </details>
+
+        <div style={{ marginTop: 32 }}>
+          <button className="adm-btn adm-btn-gold" onClick={backToList}>✓ Terminei — voltar aos cardápios</button>
         </div>
 
       </div>
