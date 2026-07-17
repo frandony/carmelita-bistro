@@ -1,0 +1,235 @@
+================================================================
+  CARMELITA BISTRO - PLANO DE SEGURANCA DO SITE
+  (foco: proteger o painel Admin e o cardapio com Supabase)
+================================================================
+
+----------------------------------------------------------------
+1. SITUACAO ATUAL (E POR QUE ELA E INSEGURA)
+----------------------------------------------------------------
+
+a) A senha do admin esta escrita direto no codigo do site
+   - Arquivo: app.jsx, linha 628 -> const ADMIN_PASS = "carmelita2026";
+   - Qualquer pessoa pode apertar F12 no navegador (ou "Exibir
+     codigo-fonte") e LER a senha em texto puro. Nao precisa
+     "invadir" nada: o navegador baixa o app.jsx inteiro para
+     conseguir rodar o site.
+
+b) A verificacao da senha acontece no navegador do visitante
+   - O "if (pass === ADMIN_PASS)" roda na maquina de quem visita.
+     Mesmo trocando a senha por outra, ela continua visivel.
+     Senha no front-end NUNCA e seguranca de verdade - e so um
+     "esconde-esconde" de interface.
+
+c) As edicoes do cardapio ficam no localStorage do navegador
+   - So valem naquele navegador/computador. Nao existe banco de
+     dados: se limpar o cache, perde as edicoes; e o cardapio
+     publicado (menu.json) so muda editando o arquivo manualmente.
+
+IMPORTANTE: mover a senha para uma TABELA no Supabase e comparar
+ela no front-end NAO resolve o problema (a comparacao continuaria
+no navegador e a tabela teria que ser legivel publicamente).
+O caminho certo e usar o Supabase AUTH, que guarda a senha ja
+criptografada (hash bcrypt) e faz a verificacao NO SERVIDOR.
+
+----------------------------------------------------------------
+2. O QUE PRECISA SER FEITO (VISAO GERAL)
+----------------------------------------------------------------
+
+  [ANTES]  senha no codigo  ->  qualquer um ve  ->  localStorage
+  [DEPOIS] login via Supabase Auth (servidor)  ->  token JWT
+           -> cardapio salvo em tabela protegida por RLS
+           -> site publico so consegue LER o cardapio
+
+Passo a passo:
+
+  PASSO 1 - Criar o projeto no Supabase
+    - Criar conta em https://supabase.com (plano gratuito serve).
+    - Criar um projeto (ex.: "carmelita-bistro").
+    - Guardar 2 informacoes do painel (Settings > API):
+        * Project URL   (ex.: https://xxxx.supabase.co)
+        * anon key      (chave publica - pode ficar no site)
+    - NUNCA usar/copiar a "service_role key" no site. Ela da
+      acesso total ao banco e so pode viver em servidor.
+
+  PASSO 2 - Criar o usuario admin (Supabase Auth)
+    - No painel: Authentication > Users > "Add user".
+    - Criar com o e-mail da Fernanda/responsavel e uma senha
+      FORTE e NOVA (nao reaproveitar "carmelita2026", que ja
+      esta exposta no codigo e no historico do git).
+    - Desativar cadastro publico: Authentication > Providers >
+      Email > desligar "Enable Signups" (so o admin criado no
+      painel podera logar; ninguem consegue se auto-registrar).
+
+  PASSO 3 - Criar a tabela do cardapio
+    - SQL de exemplo (SQL Editor do Supabase):
+
+        create table public.site_menus (
+          id         text primary key default 'principal',
+          data       jsonb not null,
+          updated_at timestamptz not null default now()
+        );
+
+        alter table public.site_menus enable row level security;
+
+        -- qualquer visitante pode LER o cardapio
+        create policy "leitura publica"
+          on public.site_menus for select
+          using (true);
+
+        -- apenas usuario logado (admin) pode gravar
+        create policy "escrita apenas autenticado"
+          on public.site_menus for insert
+          with check (auth.role() = 'authenticated');
+
+        create policy "update apenas autenticado"
+          on public.site_menus for update
+          using (auth.role() = 'authenticated');
+
+    - RLS (Row Level Security) e o que garante que, mesmo com a
+      anon key publica, um visitante SO consegue ler, nunca
+      alterar o cardapio.
+
+  PASSO 4 - Alterar o site (app.jsx)
+    - Incluir a biblioteca supabase-js (via CDN, igual ao React).
+    - Tela de login do admin passa a chamar:
+        supabase.auth.signInWithPassword({ email, senha })
+      (a senha vai criptografada por HTTPS e e conferida no
+      servidor do Supabase; o codigo do site nao contem senha).
+    - Remover a constante ADMIN_PASS do codigo.
+    - Salvar cardapio: em vez de localStorage, fazer
+        supabase.from('site_menus').upsert({ id: 'principal', data })
+    - Carregar cardapio (pagina publica):
+        supabase.from('site_menus').select('data').eq('id','principal')
+      com fallback para o menu.json atual se o banco estiver fora.
+    - Botao "Sair" chamando supabase.auth.signOut().
+
+  PASSO 5 - Limpeza depois da migracao
+    - Trocar QUALQUER lugar que ainda cite a senha antiga.
+    - A senha antiga aparece no historico do git; como o codigo e
+      publico no navegador de qualquer forma, o essencial e que a
+      senha nova nunca entre no codigo/no git.
+
+----------------------------------------------------------------
+3. CARDAPIO EDITAVEL PELA PAGINA (GASTAO & FERNANDA)
+----------------------------------------------------------------
+
+Objetivo: eles editam o cardapio no proprio site (pagina #admin,
+que ja existe) e a alteracao aparece PARA TODOS os visitantes,
+em qualquer celular/computador.
+
+O painel de edicao ja esta pronto - o que muda e ONDE ele salva:
+
+  HOJE (localStorage - so no navegador de quem editou):
+
+    Fernanda edita ---> salva no navegador DELA
+    Visitante abre  ---> ve o menu.json antigo  (X nao atualiza)
+
+  DEPOIS (Supabase - banco compartilhado na nuvem):
+
+    Fernanda/Gastao
+        |
+        v
+    site #admin -- login (e-mail + senha) --> Supabase Auth
+        |                                        |
+        | edita prato/preco                      | token de acesso
+        v                                        v
+    "Salvar" ----------- upsert ---------> tabela site_menus
+                                                 |
+    Visitante abre o site ----- select --------> |
+        |                                        |
+        v                                        v
+    cardapio SEMPRE atualizado, igual para todo mundo
+
+  Como fica no dia a dia deles (sem tecniques):
+    1. Abrir o site e clicar em "Admin" (ou ir direto em #admin).
+    2. Entrar com e-mail e senha (uma conta para cada um, de
+       preferencia - da para saber quem alterou e cortar o acesso
+       de um sem afetar o outro).
+    3. Editar prato, preco, categoria - igual ja funciona hoje.
+    4. O auto-save grava no banco; em segundos o site publico
+       ja mostra a versao nova para qualquer visitante.
+
+  O que muda no codigo (app.jsx):
+    - Carregar o cardapio: em vez de localStorage/menu.json,
+      buscar da tabela site_menus (menu.json vira so um fallback
+      se o banco estiver fora do ar).
+    - Salvar: o auto-save que hoje escreve no localStorage passa
+      a fazer upsert na tabela (so funciona logado - o RLS barra
+      qualquer outra pessoa).
+    - Login: tela de senha atual passa a pedir e-mail + senha e
+      chamar supabase.auth.signInWithPassword (ver secao 2).
+    - Botao "Sair" (signOut) no painel.
+
+  Detalhes ja levantados da sua conta (nada foi criado ainda):
+    - Organizacao existente no Supabase: 1 (conectada ao Claude).
+    - Criar projeto novo custa R$ 0/mes no plano gratuito.
+    - Existe um projeto antigo pausado na conta; recomendado
+      criar um projeto novo "carmelita-bistro" dedicado.
+
+----------------------------------------------------------------
+4. RECOMENDACOES DE SEGURANCA (CHECKLIST)
+----------------------------------------------------------------
+
+  Senha e login
+  [ ] Senha forte: 12+ caracteres, letras + numeros + simbolos,
+      sem nome do restaurante ou datas.
+  [ ] Guardar a senha em um gerenciador (Bitwarden, 1Password)
+      ou anotada em local fisico seguro - nunca em arquivo no
+      projeto.
+  [ ] Ativar em Authentication > Settings a protecao contra
+      senhas vazadas ("Leaked password protection").
+  [ ] O Supabase ja aplica limite de tentativas de login
+      (rate limiting) - protege contra robo testando senhas.
+
+  Chaves e codigo
+  [ ] anon key no site: OK (ela e feita para ser publica).
+  [ ] service_role key: JAMAIS no site, em arquivo do projeto ou
+      no git.
+  [ ] Nao criar tabela de "senhas" propria - Auth ja faz isso com
+      hash bcrypt, do jeito certo.
+
+  Banco de dados
+  [ ] RLS LIGADO em toda tabela criada (sem RLS, a anon key
+      permite escrita por qualquer visitante!).
+  [ ] Testar: deslogado, tentar upsert pelo console do navegador
+      e confirmar que recebe erro de permissao.
+  [ ] Conferir avisos do proprio Supabase em Advisors (painel) -
+      ele aponta tabelas sem RLS e outros problemas.
+
+  Site
+  [ ] Publicar o site sempre com HTTPS (Vercel/Netlify ja dao).
+  [ ] Manter o fallback do menu.json para o site nao quebrar se
+      o Supabase estiver indisponivel.
+  [ ] Backup: de vez em quando usar o botao "Exportar" do admin
+      (ou baixar a tabela pelo painel) para ter copia do cardapio.
+
+  Extras (opcional, para depois)
+  [ ] E-mail de recuperacao de senha configurado no Supabase.
+  [ ] 2FA (autenticacao em dois fatores) na conta do Supabase
+      (a conta do painel e mais critica que a do site).
+  [ ] Trocar a senha do admin a cada 6-12 meses ou quando alguem
+      sair da equipe.
+
+----------------------------------------------------------------
+5. ORDEM DE EXECUCAO SUGERIDA (QUANDO FORMOS IMPLEMENTAR)
+----------------------------------------------------------------
+  1. Criar projeto "carmelita-bistro" no Supabase (R$ 0/mes).
+  2. Rodar o SQL da tabela site_menus + policies de RLS (secao 2).
+  3. Criar as contas da Fernanda e do Gastao no Auth (senha forte)
+     e desligar o cadastro publico.
+  4. Alterar o app.jsx: login por e-mail/senha, carregar e salvar
+     o cardapio no banco, botao Sair, fallback para menu.json.
+  5. Publicar o menu.json atual como primeiro registro da tabela.
+  6. Testar: editar logado num navegador e conferir a mudanca
+     aparecendo em outro navegador/celular sem login.
+  7. Remover ADMIN_PASS do codigo e conferir o checklist da
+     secao 4.
+
+----------------------------------------------------------------
+6. RESUMO EM UMA FRASE
+----------------------------------------------------------------
+Tirar a senha do codigo, criar login de verdade com Supabase Auth
+(senha criptografada e conferida no servidor), guardar o cardapio
+em tabela com RLS (todos leem, so o admin grava - e por isso o que
+a Fernanda e o Gastao editarem aparece para todo mundo) e nunca
+colocar a service_role key no site.
