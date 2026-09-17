@@ -182,10 +182,7 @@ function Landing({ go }) {
           <p className="hero-verse reveal d5">
             A gente não quer só comida, a gente quer bebida, diversão, balé<br/>
             A gente não quer só comida, a gente quer a vida como a vida quer.
-            <span className="hero-verse-author">
-              Titãs
-              <span className="eq-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-            </span>
+            <span className="hero-verse-author">Titãs</span>
           </p>
           <div className="hero-ctas reveal d6">
             <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar mesa</button>
@@ -367,30 +364,12 @@ function Sobre({ go }) {
       <section className="block" style={{ paddingTop: 40, paddingBottom: 40 }}>
         <div className="container">
           <div className="sobre-editorial">
-            <div className="chef-photo-wrap reveal">
-              <div className="chef-photo">
-                <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
-                     alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
-                <div className="chef-photo-caption">
-                  O salão
-                  <span className="small">quadros de músicos · mesas postas</span>
-                </div>
-              </div>
-              <div className="chef-photo-badge" aria-hidden="true" title="Rock 'n' roll na cozinha">
-                <svg viewBox="0 0 100 100">
-                  <defs>
-                    <linearGradient id="pickGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#b07c2a" />
-                      <stop offset="20%" stopColor="#e8d48a" />
-                      <stop offset="38%" stopColor="#faf2d8" />
-                      <stop offset="55%" stopColor="#d4a840" />
-                      <stop offset="74%" stopColor="#f0e09c" />
-                      <stop offset="100%" stopColor="#b88030" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M50,95 C20,80 10,55 15,35 C20,10 40,2 50,2 C60,2 80,10 85,35 C90,55 80,80 50,95 Z"
-                        fill="url(#pickGrad)" stroke="#111111" strokeWidth="2" />
-                </svg>
+            <div className="chef-photo reveal">
+              <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
+                   alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
+              <div className="chef-photo-caption">
+                O salão
+                <span className="small">quadros de músicos · mesas postas</span>
               </div>
             </div>
             <div className="sobre-prose reveal d1">
