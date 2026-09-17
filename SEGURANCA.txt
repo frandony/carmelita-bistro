@@ -3,6 +3,24 @@
   (foco: proteger o painel Admin e o cardapio com Supabase)
 ================================================================
 
+STATUS (2026-09-17):
+  [x] Passo 1 - Projeto Supabase criado (carmelita-bistro)
+  [x] Passo 3 - Tabela site_menus criada, RLS ligado, testado
+      (leitura publica OK / escrita sem login bloqueada, confirmado
+      via API)
+  [x] Passo 4 - app.jsx reescrito: login por e-mail/senha via
+      Supabase Auth, cardapio publico e do admin lendo/gravando na
+      tabela site_menus, fallback pra menu.json se o banco cair,
+      ADMIN_PASS removido do codigo
+  [x] Passo 5 - menu.json atual publicado como registro "principal"
+      na tabela
+  [ ] Passo 2 - AINDA PENDENTE: criar o(s) usuario(s) de login em
+      Authentication > Users e desligar "Enable Signups". Sem isso
+      ninguem consegue entrar no /admin ainda.
+  [ ] Trocar a senha do banco de dados (foi compartilhada no chat
+      pra rodar a migracao por aqui em vez do SQL Editor do painel -
+      trocar em Settings > Database > Reset database password)
+
 ----------------------------------------------------------------
 1. SITUACAO ATUAL (E POR QUE ELA E INSEGURA)
 ----------------------------------------------------------------

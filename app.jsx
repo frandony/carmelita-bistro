@@ -182,7 +182,10 @@ function Landing({ go }) {
           <p className="hero-verse reveal d5">
             A gente não quer só comida, a gente quer bebida, diversão, balé<br/>
             A gente não quer só comida, a gente quer a vida como a vida quer.
-            <span className="hero-verse-author">Titãs</span>
+            <span className="hero-verse-author">
+              Titãs
+              <span className="eq-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            </span>
           </p>
           <div className="hero-ctas reveal d6">
             <button className="btn btn-primary" onClick={() => go("reservas")}>Reservar mesa</button>
@@ -260,7 +263,8 @@ function Landing({ go }) {
               <span className="mood-label">Salão</span>
             </div>
             <div className="mood-tile t2 reveal d2">
-              <Placeholder kind="deep" label="02 · Risoto caprese" note="camarão · manjericão" />
+              <img className="mood-photo" src={encodeURI("assets/panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg")}
+                   alt="Panela Mar e Terra — camarões salteados, fritas com parmesão e mignon ao chimichurri" loading="lazy" />
               <span className="mood-label">Prato</span>
             </div>
             <div className="mood-tile t3 reveal d3">
@@ -268,7 +272,8 @@ function Landing({ go }) {
               <span className="mood-label">Arte</span>
             </div>
             <div className="mood-tile t4 reveal d2">
-              <Placeholder kind="pale" label="04 · Feijoada da Fê" note="sáb & dom · por Fernanda Bezzi" />
+              <img className="mood-photo" src={encodeURI("assets/feijoada da fe.jpeg")}
+                   alt="Feijoada da Fê — feita por Fernanda Bezzi, servida aos sábados e domingos" loading="lazy" />
               <span className="mood-label">Fim de semana</span>
             </div>
             <div className="mood-tile t5 reveal d3">
@@ -276,8 +281,9 @@ function Landing({ go }) {
               <span className="mood-label">Petisco</span>
             </div>
             <div className="mood-tile t6 reveal d4">
-              <Placeholder kind="deep" label="06 · Bobozinho de camarão" note="porção bistrô" />
-              <span className="mood-label">Bistrô</span>
+              <img className="mood-photo" src={encodeURI("assets/risole de camarao com molho tartaro.jpeg")}
+                   alt="Rissole de camarão com molho tártaro" loading="lazy" />
+              <span className="mood-label">Entrada</span>
             </div>
           </div>
         </div>
@@ -361,12 +367,30 @@ function Sobre({ go }) {
       <section className="block" style={{ paddingTop: 40, paddingBottom: 40 }}>
         <div className="container">
           <div className="sobre-editorial">
-            <div className="chef-photo reveal">
-              <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
-                   alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
-              <div className="chef-photo-caption">
-                O salão
-                <span className="small">quadros de músicos · mesas postas</span>
+            <div className="chef-photo-wrap reveal">
+              <div className="chef-photo">
+                <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
+                     alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
+                <div className="chef-photo-caption">
+                  O salão
+                  <span className="small">quadros de músicos · mesas postas</span>
+                </div>
+              </div>
+              <div className="chef-photo-badge" aria-hidden="true" title="Rock 'n' roll na cozinha">
+                <svg viewBox="0 0 100 100">
+                  <defs>
+                    <linearGradient id="pickGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#b07c2a" />
+                      <stop offset="20%" stopColor="#e8d48a" />
+                      <stop offset="38%" stopColor="#faf2d8" />
+                      <stop offset="55%" stopColor="#d4a840" />
+                      <stop offset="74%" stopColor="#f0e09c" />
+                      <stop offset="100%" stopColor="#b88030" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M50,95 C20,80 10,55 15,35 C20,10 40,2 50,2 C60,2 80,10 85,35 C90,55 80,80 50,95 Z"
+                        fill="url(#pickGrad)" stroke="#111111" strokeWidth="2" />
+                </svg>
               </div>
             </div>
             <div className="sobre-prose reveal d1">
@@ -427,26 +451,33 @@ function Sobre({ go }) {
   );
 }
 
-// ====== Dados dos cardápios (localStorage do admin > menu.json > bloco inline) ======
-const DATA_KEY = "carmelita-data-v2";
+// ====== Supabase (login do admin + cardápio compartilhado) ======
+const SUPABASE_URL = "https://cjxhpbqurgephxyemjlv.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNqeGhwYnF1cmdlcGh4eWVtamx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzM4NTQsImV4cCI6MjEwNTI0OTg1NH0.xKwGHWfI3KiverKvn0JK1XTvnpzRKg0DSTrnyB6qXIw";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ====== Dados dos cardápios (tabela site_menus no Supabase > menu.json > bloco inline) ======
 function normalizeMenus(d) {
   return d && Array.isArray(d.menus) ? d : null;
 }
 
+// Leitura instantânea (offline-safe) usada só como 1º paint, antes do Supabase responder.
 function loadMenusData() {
-  try {
-    const stored = localStorage.getItem(DATA_KEY);
-    if (stored) {
-      const d = normalizeMenus(JSON.parse(stored));
-      if (d) return d;
-    }
-  } catch {}
   try {
     const d = normalizeMenus(JSON.parse(document.getElementById("menu-data").textContent));
     if (d) return d;
   } catch {}
   return { menus: [] };
+}
+
+function fetchPublishedMenus() {
+  return supabase.from("site_menus").select("data").eq("id", "principal").single()
+    .then(({ data: row, error }) => {
+      if (error || !row) throw error || new Error("sem dados");
+      const n = normalizeMenus(row.data);
+      if (!n) throw new Error("formato inválido");
+      return n;
+    });
 }
 
 // ====== Cardápio ======
@@ -460,18 +491,24 @@ function Cardapio({ go }) {
   useReveal();
   const [data, setData] = useState(loadMenusData);
 
-  // menu.json é a fonte publicada; edições locais do admin (localStorage) têm prioridade
+  // Supabase é a fonte publicada e compartilhada; menu.json entra só se o banco estiver fora do ar.
   useEffect(() => {
-    if (localStorage.getItem(DATA_KEY)) return;
-    fetch("menu.json")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { const n = normalizeMenus(d); if (n) setData(n); })
+    let cancelled = false;
+    fetchPublishedMenus()
+      .catch(() => fetch("menu.json").then((r) => (r.ok ? r.json() : null)).then(normalizeMenus))
+      .then((n) => { if (n && !cancelled) setData(n); })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const menus = data.menus.filter((m) => m.public !== false);
   const [menuId, setMenuId] = useState(null);
   const menu = menus.find((m) => m.id === menuId) || menus[0] || { categories: [], items: [] };
+
+  const featured = useMemo(
+    () => menus.flatMap((m) => m.items.filter((it) => it.img)),
+    [menus]
+  );
 
   const sections = useMemo(() => {
     const cats = menu.categories.filter((c) => c.id !== "all");
@@ -497,6 +534,22 @@ function Cardapio({ go }) {
       </section>
 
       <section className="container menu-editorial">
+        {featured.length > 0 && (
+          <div className="menu-featured reveal">
+            <div className="menu-featured-grid">
+              {featured.map((it) => (
+                <figure className="featured-card" key={it.name}>
+                  <img className="featured-photo" src={encodeURI(`assets/${it.img}`)} alt={it.name} />
+                  <figcaption className="featured-caption">
+                    {it.tag ? <span className="featured-tag">{it.tag}</span> : null}
+                    <span className="featured-name">{it.name}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+
         {menus.length > 1 && (
           <div className="menu-switch reveal">
             {menus.map((m) => (
@@ -625,16 +678,6 @@ function Reservas({ go }) {
 }
 
 // ====== Admin ======
-const ADMIN_PASS = "carmelita2026";
-
-function defaultMenusData() {
-  try {
-    const d = normalizeMenus(JSON.parse(document.getElementById("menu-data").textContent));
-    if (d) return d;
-  } catch {}
-  return { menus: [] };
-}
-
 function slugify(s) {
   return s.toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -642,14 +685,19 @@ function slugify(s) {
 }
 
 function Admin() {
-  const [authed, setAuthed]   = useState(false);
+  const [session, setSession] = useState(undefined); // undefined = verificando · null = deslogado
+  const [email, setEmail]     = useState("");
   const [pass, setPass]       = useState("");
-  const [passErr, setPassErr] = useState(false);
+  const [authErr, setAuthErr] = useState("");
+  const [authBusy, setAuthBusy] = useState(false);
 
-  const [data, setData]   = useState(loadMenusData);
+  const [data, setData]       = useState(null); // null enquanto carrega do Supabase
+  const [loadError, setLoadError] = useState(false);
+  const skipNextSave = useRef(true); // evita regravar no banco logo após o carregamento inicial
+
   const [selId, setSelId] = useState(null);
   const [view, setView]   = useState("list"); // "list" = escolher cardápio · "edit" = editar cardápio
-  const sel = data.menus.find(m => m.id === selId) || null;
+  const sel = data ? data.menus.find(m => m.id === selId) || null : null;
 
   const [editItem, setEditItem]     = useState(null);
   const [editForm, setEditForm]     = useState({});
@@ -659,25 +707,47 @@ function Admin() {
   const [saveStatus, setSaveStatus] = useState("idle");
   const importRef = useRef(null);
 
-  // Auto-save com debounce (neste navegador)
+  // ── Sessão (login) ──
   useEffect(() => {
-    if (!authed) return;
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  // ── Carregar o cardápio publicado assim que loga ──
+  useEffect(() => {
+    if (!session) { setData(null); return; }
+    setLoadError(false);
+    skipNextSave.current = true;
+    fetchPublishedMenus()
+      .then((n) => setData(n))
+      .catch(() => setLoadError(true));
+  }, [session]);
+
+  // Auto-save com debounce — grava direto na tabela do Supabase (visível pra todo mundo)
+  useEffect(() => {
+    if (!session || !data) return;
+    if (skipNextSave.current) { skipNextSave.current = false; return; }
     setSaveStatus("saving");
     const t = setTimeout(() => {
-      try {
-        localStorage.setItem(DATA_KEY, JSON.stringify(data));
-        setSaveStatus("saved");
+      supabase.from("site_menus").upsert({ id: "principal", data }).then(({ error }) => {
+        setSaveStatus(error ? "error" : "saved");
         setTimeout(() => setSaveStatus("idle"), 2000);
-      } catch { setSaveStatus("idle"); }
+      });
     }, 700);
     return () => clearTimeout(t);
-  }, [data, authed]);
+  }, [data, session]);
 
-  const login = (e) => {
+  const login = async (e) => {
     e.preventDefault();
-    if (pass === ADMIN_PASS) { setAuthed(true); setPassErr(false); }
-    else setPassErr(true);
+    setAuthErr("");
+    setAuthBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    setAuthBusy(false);
+    if (error) setAuthErr("E-mail ou senha incorretos.");
   };
+
+  const logout = () => supabase.auth.signOut();
 
   const openMenu = (id) => {
     setSelId(id);
@@ -795,10 +865,10 @@ function Admin() {
     e.target.value = "";
   };
 
-  const resetDefault = () => {
-    if (!confirm("Descartar TODAS as mudanças feitas neste computador e voltar ao cardápio que está publicado no site?")) return;
-    localStorage.removeItem(DATA_KEY);
-    setData(defaultMenusData());
+  const reloadFromServer = () => {
+    if (!confirm("Recarregar o cardápio do banco? Mudanças feitas nos últimos segundos (ainda não salvas) serão perdidas.")) return;
+    skipNextSave.current = true;
+    fetchPublishedMenus().then(setData).catch(() => alert("Não foi possível recarregar agora — verifique sua internet."));
     backToList();
   };
 
@@ -816,7 +886,15 @@ function Admin() {
     return groups;
   })() : [];
 
-  if (!authed) {
+  if (session === undefined) {
+    return (
+      <div className="page page-enter admin-page" style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
+        <p style={{ opacity: 0.6 }}>Carregando…</p>
+      </div>
+    );
+  }
+
+  if (!session) {
     return (
       <div className="page page-enter admin-page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
         <div style={{ width: "100%", maxWidth: 360, padding: "0 24px" }}>
@@ -826,14 +904,38 @@ function Admin() {
           </div>
           <form onSubmit={login} className="admin-form">
             <div className="form-field" style={{ marginBottom: 16 }}>
-              <label htmlFor="admin-pass">Senha de acesso</label>
-              <input id="admin-pass" type="password" value={pass}
-                     onChange={(e) => setPass(e.target.value)} placeholder="••••••••" autoFocus />
+              <label htmlFor="admin-email">E-mail</label>
+              <input id="admin-email" type="email" value={email} autoComplete="username"
+                     onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" autoFocus />
             </div>
-            {passErr && <p style={{ color: "#c0392b", fontSize: "0.9rem", marginBottom: 12 }}>Senha incorreta.</p>}
-            <button type="submit" className="form-submit" style={{ width: "100%" }}>Entrar</button>
+            <div className="form-field" style={{ marginBottom: 16 }}>
+              <label htmlFor="admin-pass">Senha</label>
+              <input id="admin-pass" type="password" value={pass} autoComplete="current-password"
+                     onChange={(e) => setPass(e.target.value)} placeholder="••••••••" />
+            </div>
+            {authErr && <p style={{ color: "#c0392b", fontSize: "0.9rem", marginBottom: 12 }}>{authErr}</p>}
+            <button type="submit" className="form-submit" style={{ width: "100%" }} disabled={authBusy}>
+              {authBusy ? "Entrando…" : "Entrar"}
+            </button>
           </form>
         </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="page page-enter admin-page container" style={{ textAlign: "center", paddingTop: 160 }}>
+        <p style={{ marginBottom: 20 }}>Não foi possível carregar o cardápio do banco agora. Verifique sua internet e tente de novo.</p>
+        <button className="adm-btn adm-btn-line" onClick={logout}>Sair</button>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="page page-enter admin-page" style={{ display: "grid", placeItems: "center", minHeight: "100vh" }}>
+        <p style={{ opacity: 0.6 }}>Carregando cardápio…</p>
       </div>
     );
   }
@@ -849,12 +951,17 @@ function Admin() {
               <div className="block-eyebrow" style={{ marginBottom: 8 }}>Área da casa</div>
               <h1 className="block-title" style={{ margin: 0 }}>Meus <em>cardápios</em>.</h1>
             </div>
-            <span className="adm-status">{saveStatus === "saving" ? "Guardando…" : "✓ Tudo guardado"}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <span className="adm-status">
+                {saveStatus === "saving" ? "Guardando…" : saveStatus === "error" ? "⚠ Erro ao publicar" : "✓ Publicado no site"}
+              </span>
+              <button className="adm-btn adm-btn-line" onClick={logout}>Sair</button>
+            </div>
           </div>
 
           <div className="adm-help">
             <strong>Como funciona:</strong> toque em <em>Editar</em> no cardápio que você quer mexer.
-            Quando terminar, use o quadro <em>Publicar no site</em>, no fim desta página.
+            Tudo o que mudar aparece <em>sozinho, em segundos</em>, para qualquer visitante do site.
           </div>
 
           <div className="adm-grid">
@@ -876,22 +983,21 @@ function Admin() {
           </div>
 
           <div className="adm-publish">
-            <div className="adm-publish-title">🌐 Publicar no site</div>
+            <div className="adm-publish-title">🌐 Já está no ar</div>
             <p>
-              O que você edita aqui fica guardado <strong>somente neste computador</strong>.
-              Para o site mudar para todos os clientes: baixe o arquivo do cardápio no botão
-              abaixo e envie para o desenvolvedor.
+              Suas edições são publicadas <strong>automaticamente</strong>, para todo mundo,
+              assim que você para de digitar. Não precisa baixar nem enviar nada pra ninguém.
             </p>
-            <button className="adm-btn adm-btn-gold" onClick={exportJson}>⬇️ Baixar arquivo do cardápio</button>
+            <button className="adm-btn adm-btn-gold" onClick={exportJson}>⬇️ Baixar cópia de segurança</button>
 
             <details className="adm-advanced">
               <summary>Opções avançadas</summary>
               <div className="adm-advanced-row">
                 <button className="adm-btn adm-btn-line" onClick={() => importRef.current && importRef.current.click()}>
-                  Carregar um arquivo de cardápio
+                  Restaurar de um arquivo de cardápio
                 </button>
-                <button className="adm-btn adm-btn-line adm-btn-danger" onClick={resetDefault}>
-                  Desfazer tudo e voltar ao cardápio do site
+                <button className="adm-btn adm-btn-line adm-btn-danger" onClick={reloadFromServer}>
+                  Recarregar o cardápio do banco
                 </button>
               </div>
               <input ref={importRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importJson} />
@@ -914,12 +1020,17 @@ function Admin() {
 
         <div className="adm-head">
           <button className="adm-back" onClick={backToList}>← Voltar aos cardápios</button>
-          <span className="adm-status">{saveStatus === "saving" ? "Guardando…" : "✓ Tudo guardado"}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <span className="adm-status">
+              {saveStatus === "saving" ? "Guardando…" : saveStatus === "error" ? "⚠ Erro ao publicar" : "✓ Publicado no site"}
+            </span>
+            <button className="adm-btn adm-btn-line" onClick={logout}>Sair</button>
+          </div>
         </div>
 
         <h1 className="block-title" style={{ margin: "0 0 6px" }}>{sel.name}</h1>
         <p className="adm-help" style={{ marginBottom: 34 }}>
-          Tudo o que você mudar aqui é guardado sozinho — não precisa apertar nenhum botão de salvar.
+          Tudo o que você mudar aqui é publicado sozinho, pra todo mundo — não precisa apertar nenhum botão de salvar.
         </p>
 
         {/* ── Passo 1: informações ── */}

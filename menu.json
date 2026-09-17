@@ -9,7 +9,8 @@
         { "id": "entradas", "label": "Entradas & Petiscos" },
         { "id": "massas", "label": "Massas & Risotos" },
         { "id": "principais", "label": "Pratos Principais" },
-        { "id": "sobremesas", "label": "Sobremesas" }
+        { "id": "sobremesas", "label": "Sobremesas" },
+        { "id": "bebidas", "label": "Bebidas" }
       ],
       "items": [
         { "cat": "entradas", "name": "Dadinhos de Tapioca", "desc": "Dadinhos crocantes de tapioca com molho agridoce apimentado da casa.", "price": "", "tag": "Casa" },
@@ -19,7 +20,19 @@
         { "cat": "massas", "name": "Risoto Caprese com Camarão Salteado", "desc": "Risoto cremoso de tomate e mussarela de búfala, finalizado com camarões salteados e manjericão fresco.", "price": "", "tag": "Prato da casa" },
         { "cat": "massas", "name": "Ravióli de Banana da Terra", "desc": "Massa fresca recheada com banana da terra ao molho de cogumelos frescos.", "price": "", "tag": "Autoral" },
         { "cat": "principais", "name": "Hambúrguer Artesanal", "desc": "Blend bovino da casa, pão brioche tostado, acompanhamentos do chef.", "price": "" },
-        { "cat": "sobremesas", "name": "Mousse Meio Amargo", "desc": "Mousse aerada de chocolate meio amargo com toque de flor de sal.", "price": "" }
+        { "cat": "principais", "name": "Panela Mar e Terra", "desc": "Camarões salteados, batata frita com parmesão e mignon ao chimichurri.", "price": "", "tag": "Autoral", "img": "panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg" },
+        { "cat": "sobremesas", "name": "Mousse Meio Amargo", "desc": "Mousse aerada de chocolate meio amargo com toque de flor de sal.", "price": "" },
+        { "cat": "bebidas", "name": "Long Neck", "desc": "", "price": "14,00" },
+        { "cat": "bebidas", "name": "Cerveja 600ml", "desc": "", "price": "18,00" },
+        { "cat": "bebidas", "name": "Refrigerante", "desc": "", "price": "8,00" },
+        { "cat": "bebidas", "name": "Suco de Laranja", "desc": "", "price": "12,00" },
+        { "cat": "bebidas", "name": "Campari", "desc": "Dose.", "price": "25,00" },
+        { "cat": "bebidas", "name": "Água", "desc": "", "price": "6,00" },
+        { "cat": "bebidas", "name": "Água c/ Gás", "desc": "", "price": "7,00" },
+        { "cat": "bebidas", "name": "Aperol / Gin", "desc": "", "price": "39,00" },
+        { "cat": "bebidas", "name": "Caipirinha", "desc": "", "price": "26,00" },
+        { "cat": "bebidas", "name": "Whisky 12 Anos", "desc": "", "price": "30,00" },
+        { "cat": "bebidas", "name": "Cachaça", "desc": "Dose.", "price": "8,00" }
       ]
     },
     {
@@ -28,13 +41,30 @@
       "subtitle": "Sábado & Domingo · 12h às 16h",
       "public": true,
       "categories": [
-        { "id": "pratos", "label": "Pratos do Fim de Semana" }
+        { "id": "entradas", "label": "Entradas" },
+        { "id": "pratos", "label": "Pratos do Fim de Semana" },
+        { "id": "bebidas", "label": "Bebidas" }
       ],
       "items": [
-        { "cat": "pratos", "name": "Feijoada da Fê", "desc": "Nossa clássica feijoada, feita por Fernanda Bezzi. Acompanha arroz, torresmo, couve, farofinha & laranja.", "price": "", "tag": "Sáb & Dom" },
-        { "cat": "pratos", "name": "Brasileirinho", "desc": "", "price": "" },
-        { "cat": "pratos", "name": "Linguine Alfredo c/ Camarão", "desc": "Camarões salteados no azeite c/ mix de cogumelos e o clássico molho Alfredo.", "price": "" },
-        { "cat": "pratos", "name": "Risoto Oriental", "desc": "Cubos de mignon c/ mix de cogumelos & molho tarê.", "price": "" }
+        { "cat": "entradas", "name": "Camarão c/ Fritas", "desc": "Camarões salteados, servidos com fritas da casa.", "price": "42,00" },
+        { "cat": "entradas", "name": "Rissole de Camarão", "desc": "Rissole crocante recheado de camarão (5 unidades), servido com molho tártaro.", "price": "42,00", "img": "risole de camarao com molho tartaro.jpeg" },
+        { "cat": "entradas", "name": "Mignon c/ Fritas", "desc": "Cubos de mignon grelhados, servidos com fritas da casa.", "price": "42,00" },
+        { "cat": "pratos", "name": "Feijoada da Fê", "desc": "A feijoada mais antiga e tradicional do bairro, feita por Fernanda Bezzi. Acompanha arroz, torresmo, couve, farofinha & laranja.", "price": "58,00", "tag": "Sáb & Dom", "img": "feijoada da fe.jpeg" },
+        { "cat": "pratos", "name": "Brasileirinho", "desc": "Cubo de mignon, fritas, arroz, feijão, farofa & vinagrete.", "price": "58,00" },
+        { "cat": "pratos", "name": "Risoto Oriental de Camarão", "desc": "Risoto oriental finalizado com camarões salteados.", "price": "78,00" },
+        { "cat": "pratos", "name": "Linguine Alfredo c/ Camarão", "desc": "Camarões salteados no azeite c/ mix de cogumelos e o clássico molho Alfredo.", "price": "75,00" },
+        { "cat": "pratos", "name": "Risoto Oriental c/ Cubo Mignon", "desc": "Cubos de mignon c/ mix de cogumelos & molho tarê.", "price": "78,00" },
+        { "cat": "bebidas", "name": "Long Neck", "desc": "", "price": "14,00" },
+        { "cat": "bebidas", "name": "Cerveja 600ml", "desc": "", "price": "18,00" },
+        { "cat": "bebidas", "name": "Refrigerante", "desc": "", "price": "8,00" },
+        { "cat": "bebidas", "name": "Suco de Laranja", "desc": "", "price": "12,00" },
+        { "cat": "bebidas", "name": "Campari", "desc": "Dose.", "price": "25,00" },
+        { "cat": "bebidas", "name": "Água", "desc": "", "price": "6,00" },
+        { "cat": "bebidas", "name": "Água c/ Gás", "desc": "", "price": "7,00" },
+        { "cat": "bebidas", "name": "Aperol / Gin", "desc": "", "price": "39,00" },
+        { "cat": "bebidas", "name": "Caipirinha", "desc": "", "price": "26,00" },
+        { "cat": "bebidas", "name": "Whisky 12 Anos", "desc": "", "price": "30,00" },
+        { "cat": "bebidas", "name": "Cachaça", "desc": "Dose.", "price": "8,00" }
       ]
     }
   ]

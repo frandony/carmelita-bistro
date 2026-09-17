@@ -6,7 +6,7 @@ Site institucional do Carmelita Bistrô (Praia da Costa, Vila Velha/ES): landing
 
 - **React 18** + **ReactDOM**, carregados via CDN (sem bundler/`npm install`)
 - **Babel Standalone** para compilar o JSX no navegador (`<script type="text/babel" src="app.jsx">`)
-- Dados do cardápio em `menu.json` (carregado em runtime; ver `loadMenusData()` em `app.jsx`)
+- **Supabase** (Auth + Postgres) para login do admin e para o cardápio publicado (tabela `site_menus`, RLS ligado — leitura pública, escrita só autenticado). `menu.json` e o bloco `#menu-data` do `index.html` viram fallback caso o banco esteja fora do ar
 - CSS puro, com fontes customizadas (DM Serif Display, Great Vibes, Pinyon Script, Oswald, Cormorant Garamond, Raleway)
 
 ## Estrutura
@@ -29,10 +29,10 @@ npx serve .
 
 Ou abra `index.html` diretamente no navegador.
 
-## ⚠️ Segurança do painel Admin
+## Segurança do painel Admin
 
-O login do painel administrativo hoje usa uma senha fixa no código-fonte
-(`ADMIN_PASS` em `app.jsx`), visível para qualquer pessoa que inspecione o
-site. O arquivo `SEGURANCA.txt` já documenta o problema e o plano de migração
-para Supabase Auth — vale priorizar essa migração antes de divulgar o painel
-em produção.
+O login usa **Supabase Auth** (e-mail + senha, verificado no servidor — a
+senha nunca aparece no código do site). O cardápio fica numa tabela
+(`site_menus`) protegida por Row Level Security: qualquer visitante lê,
+só quem estiver logado grava. Detalhes e checklist de segurança em
+`SEGURANCA.txt`.
