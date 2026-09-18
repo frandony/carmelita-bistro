@@ -504,8 +504,8 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 10px;
-      margin-top: 20px;
+      margin-bottom: 6px;
+      margin-top: 8px;
     }
 
     .hero-eyebrow::before,
@@ -523,7 +523,7 @@
       align-items: center;
       width: 100%;
       gap: 0;
-      margin: 40px 0 0;
+      margin: 14px 0 0;
     }
 
     .hero-logo-mark {
@@ -537,13 +537,13 @@
 
     .hero-logo-mark svg {
       display: block;
-      width: clamp(175px, 46vw, 475px);
+      width: clamp(175px, 36vw, 360px);
       height: auto;
     }
 
     .hero-wordmark {
       font-family: var(--font-script);
-      font-size: clamp(108px, 14.5vw, 188px);
+      font-size: clamp(100px, 11.5vw, 148px);
       font-weight: 400;
       letter-spacing: -0.01em;
       line-height: 0.95;
@@ -644,7 +644,14 @@
     }
 
     .hero-ctas {
-      margin-top: -8px;
+      margin-top: 48px;
+      display: inline-flex;
+      gap: 18px;
+    }
+
+    .hero-ctas .btn {
+      margin-top: 0;
+      margin-bottom: 0;
     }
 
 
@@ -688,7 +695,7 @@
 
     .hero-meta {
       position: absolute;
-      bottom: 36px;
+      bottom: 18px;
       left: 0;
       right: 0;
       display: flex;
@@ -783,7 +790,7 @@
     /* ===== Notebook (701px – 1366px) ===== */
     @media (max-width: 1366px) and (min-width: 701px) {
       .hero-logo-mark svg {
-        width: clamp(155px, 39vw, 500px);
+        width: clamp(155px, 33vw, 380px);
       }
 
       .hero-logo-mark {
@@ -2176,8 +2183,8 @@
       }
 
       .hero-ctas .btn {
-        margin-top: 36px;
-        margin-bottom: 36px;
+        margin-top: 0;
+        margin-bottom: 0;
       }
 
       .hero-ctas.reveal.in {
