@@ -13,6 +13,36 @@ function InlineLogo() {
   return <span ref={ref} className="hero-logo-mark" aria-hidden="true" />;
 }
 
+// ====== Fundo da hero — carrossel com crossfade suave ======
+const HERO_BG_IMAGES = [
+  "assets/Parte de fundo do site do carmelita.png",
+  "assets/feijoada da fe.jpeg",
+  "assets/panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg",
+  "assets/risole de camarao com molho tartaro.jpeg",
+];
+
+function HeroBg() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) return; // não fica trocando imagem sozinho para quem pediu menos movimento
+    const t = setInterval(() => setIndex((i) => (i + 1) % HERO_BG_IMAGES.length), 6000);
+    return () => clearInterval(t);
+  }, []);
+
+  return (
+    <div className="hero-bg">
+      {HERO_BG_IMAGES.map((src, i) => (
+        <div key={src}
+             className={"hero-bg-slide" + (i === index ? " active" : "")}
+             style={{ backgroundImage: `url("${encodeURI(src)}")` }} />
+      ))}
+      <div className="hero-bg-tint"></div>
+    </div>
+  );
+}
+
 // ====== Reveal-on-scroll hook ======
 function useReveal() {
   useEffect(() => {
@@ -190,7 +220,7 @@ function Landing({ go }) {
     <div className="page page-enter">
       {/* HERO */}
       <section className="hero">
-        <div className="hero-bg"></div>
+        <HeroBg />
         <div className="hero-content">
           <div className="hero-eyebrow reveal">Restaurante & Bistrô · Praia da Costa, Vila Velha</div>
 
@@ -202,7 +232,7 @@ function Landing({ go }) {
             </div>
           </div>
           <p className="hero-tagline reveal d4">
-            Cozinha autoral.<br/><em>Arte na mesa.</em>
+            Cozinha autoral.
           </p>
           <p className="hero-verse reveal d5">
             A gente não quer só comida, a gente quer bebida, diversão, balé<br/>

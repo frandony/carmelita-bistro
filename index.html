@@ -449,21 +449,42 @@
     .hero-bg {
       position: absolute;
       inset: 0;
+      overflow: hidden;
+    }
+
+    /* Cada foto ocupa a mesma caixa; só a "active" fica visível —
+       trocar o índice cruza uma foto na outra suavemente */
+    .hero-bg-slide {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      opacity: 0;
+      transition: opacity 2.4s ease-in-out;
+    }
+
+    .hero-bg-slide.active {
+      opacity: 1;
+    }
+
+    /* Tonalidade da casa, sempre por cima de qualquer foto */
+    .hero-bg-tint {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
       background-image:
         radial-gradient(ellipse at 50% 38%, rgba(181, 136, 88, 0.3) 0%, rgba(181, 136, 88, 0.1) 30%, transparent 65%),
         radial-gradient(ellipse at 85% 110%, rgba(138, 106, 68, 0.3) 0%, transparent 50%),
-        linear-gradient(180deg, rgba(27, 27, 27, 0.75) 0%, rgba(17, 17, 17, 0.95) 100%),
-        url("assets/Parte de fundo do site do carmelita.png");
-      background-size: cover, cover, cover, 150% auto;
-      background-position: center;
-      background-attachment: fixed;
+        linear-gradient(180deg, rgba(27, 27, 27, 0.75) 0%, rgba(17, 17, 17, 0.95) 100%);
     }
 
     /* Mobile/tablet: fixed attachment é bugado em navegadores móveis */
     @media (max-width: 880px) {
-      .hero-bg {
+      .hero-bg-slide {
         background-attachment: scroll;
-        background-size: cover, cover, cover, cover;
       }
     }
 
@@ -608,7 +629,7 @@
       letter-spacing: 0.01em;
       color: rgba(244, 240, 234, 0.5);
       max-width: 460px;
-      margin: 20px auto 0;
+      margin: 4px auto 0;
     }
 
     .hero-verse-author {
@@ -2143,7 +2164,7 @@
         font-size: 14px;
         line-height: 1.65;
         max-width: 490px;
-        margin: 6px auto 0;
+        margin: -6px auto 0;
       }
 
       .hero-verse.reveal.in {
@@ -2864,7 +2885,7 @@
       .hero-verse {
         font-size: 11.5px;
         line-height: 1.55;
-        margin: 12px auto 0;
+        margin: 2px auto 0;
         max-width: 300px;
       }
 
@@ -3043,7 +3064,7 @@
         scroll-behavior: auto !important;
       }
 
-      .hero-bg {
+      .hero-bg-slide {
         background-attachment: scroll !important;
       }
     }
