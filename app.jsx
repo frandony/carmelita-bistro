@@ -47,6 +47,7 @@ function Nav({ route, go, onCta }) {
   const [scrolled, setScrolled] = useState(false);
   const [overHero, setOverHero] = useState(route === "home");
   const [mobile, setMobile] = useState(false);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -58,6 +59,22 @@ function Nav({ route, go, onCta }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [route]);
+
+  // Fecha o menu ao trocar de página
+  useEffect(() => { setMobile(false); }, [route]);
+
+  // Fecha ao clicar fora ou apertar Esc — sem precisar de um fundo escurecendo a tela
+  useEffect(() => {
+    if (!mobile) return;
+    const onClick = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMobile(false); };
+    const onKey = (e) => { if (e.key === "Escape") setMobile(false); };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [mobile]);
 
   const links = [
     { id: "home", label: "Início" },
@@ -86,31 +103,26 @@ function Nav({ route, go, onCta }) {
           <a className="nav-phone" href="tel:+5527997475391">(27) 99747-5391</a>
           <button className="nav-cta" onClick={onCta}>Reservas</button>
         </div>
-        <button className="nav-burger" onClick={() => setMobile(true)} aria-label="Menu">
+        <button className={"nav-burger" + (mobile ? " open" : "")}
+                onClick={() => setMobile((m) => !m)}
+                aria-label="Menu" aria-expanded={mobile}>
           <span></span><span></span><span></span>
         </button>
+        <div className={"mobile-menu" + (mobile ? " open" : "")} ref={menuRef}>
+          {links.map((l) => (
+            <a key={l.id}
+               className={"mobile-menu-link" + (route === l.id ? " active" : "")}
+               onClick={(e) => { e.preventDefault(); go(l.id); setMobile(false); }}>
+              {l.label}
+            </a>
+          ))}
+          <div className="mobile-menu-divider"></div>
+          <a className="mobile-menu-phone" href="tel:+5527997475391">(27) 99747-5391</a>
+          <div className="mobile-menu-hours">
+            Qui & Sex · 19h–23h<br />Sáb & Dom · 12h–16h
+          </div>
+        </div>
       </nav>
-      <div className={"mobile-menu" + (mobile ? " open" : "")}>
-        <button className="mobile-close" onClick={() => setMobile(false)}>×</button>
-        <div className="mobile-brand">
-          <span className="nav-brand-text">Carmelita</span>
-          <span className="nav-brand-resto">Restô</span>
-        </div>
-        {links.map((l) => (
-          <a key={l.id}
-             className={"nav-link" + (route === l.id ? " active" : "")}
-             onClick={(e) => { e.preventDefault(); go(l.id); setMobile(false); }}>
-            {l.label}
-          </a>
-        ))}
-        <a className="nav-cta" style={{ display: "inline-block", marginTop: 16 }}
-           href="tel:+5527997475391">
-          Ligar · (27) 99747-5391
-        </a>
-        <div className="mobile-foot">
-          Qui & Sex · 19h–23h<br />Sáb & Dom · 12h–16h
-        </div>
-      </div>
     </>
   );
 }

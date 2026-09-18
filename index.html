@@ -261,22 +261,79 @@
       }
     }
 
+    /* Dropdown discreto, ancorado no hambúrguer — não toma a tela toda */
     .mobile-menu {
-      position: fixed;
-      inset: 0;
+      position: absolute;
+      top: 100%;
+      right: 14px;
+      margin-top: 10px;
       z-index: 200;
-      background: var(--preto-vintage);
+      min-width: 210px;
+      background: var(--grafite-soft);
+      border: 1px solid rgba(138, 106, 68, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+      padding: 8px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 36px;
-      transform: translateY(-100%);
-      transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
+      opacity: 0;
+      transform: translateY(-8px) scale(0.97);
+      transform-origin: top right;
+      pointer-events: none;
+      transition: opacity 0.35s var(--ease-luxury), transform 0.35s var(--ease-luxury);
     }
 
     .mobile-menu.open {
-      transform: translateY(0);
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .mobile-menu-link {
+      display: block;
+      padding: 12px 14px;
+      font-family: var(--font-rock);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      border-radius: 6px;
+      transition: background 0.3s var(--ease-luxury), color 0.3s var(--ease-luxury);
+    }
+
+    .mobile-menu-link:hover,
+    .mobile-menu-link:focus-visible {
+      background: rgba(138, 106, 68, 0.16);
+      color: var(--bronze-glow);
+    }
+
+    .mobile-menu-link.active {
+      color: var(--bronze-glow);
+    }
+
+    .mobile-menu-divider {
+      height: 1px;
+      background: rgba(216, 199, 174, 0.14);
+      margin: 6px 6px;
+    }
+
+    .mobile-menu-phone {
+      display: block;
+      padding: 10px 14px 2px;
+      font-family: var(--font-rock);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--bege-areia);
+    }
+
+    .mobile-menu-hours {
+      padding: 4px 14px 8px;
+      font-family: var(--font-rock);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(244, 240, 234, 0.45);
+      line-height: 1.8;
     }
 
     @media (max-width: 880px) {
@@ -298,9 +355,12 @@
       .nav-burger {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         gap: 5px;
         padding: 6px;
         margin-left: auto;
+        position: relative;
+        z-index: 201;
       }
 
       .nav-burger span {
@@ -308,43 +368,20 @@
         height: 1px;
         background: var(--off-white);
         display: block;
+        transition: transform 0.35s var(--ease-luxury), opacity 0.35s var(--ease-luxury);
       }
 
-      .mobile-menu .nav-link {
-        font-size: 22px;
-        letter-spacing: 0.4em;
+      .nav-burger.open span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
       }
 
-      .mobile-close {
-        position: absolute;
-        top: 22px;
-        right: 22px;
-        font-size: 28px;
-        color: var(--off-white);
+      .nav-burger.open span:nth-child(2) {
+        opacity: 0;
       }
-    }
 
-    .mobile-brand {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .mobile-brand .nav-brand-text {
-      font-size: 44px;
-    }
-
-    .mobile-foot {
-      font-family: var(--font-rock);
-      font-size: 11px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      text-align: center;
-      line-height: 2;
-      color: rgba(244, 240, 234, 0.45);
-      margin-top: 10px;
+      .nav-burger.open span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+      }
     }
 
     /* ===== Page wrapper ===== */
@@ -479,7 +516,8 @@
       max-width: 100%;
       margin: 0 0 10px;
       text-align: center;
-      white-space: nowrap;
+      white-space: normal;
+      overflow-wrap: anywhere;
       filter:
         drop-shadow(0 0 22px rgba(212, 168, 60, 0.28)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.32));
       animation: wordmarkGlow 5s ease-in-out infinite;
@@ -667,6 +705,14 @@
 
       .hero-eyebrow {
         font-size: 10px;
+      }
+
+      /* Em telas estreitas o texto quebra em 2 linhas — os tracinhos
+         ornamentais ficam centralizados entre as linhas e parecem
+         tortos, então somem aqui e o texto fica limpo, sozinho */
+      .hero-eyebrow::before,
+      .hero-eyebrow::after {
+        display: none;
       }
 
       .hero-logo-mark svg {
