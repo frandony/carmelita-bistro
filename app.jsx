@@ -786,6 +786,16 @@ function Reservas({ go }) {
 }
 
 // ====== Admin ======
+// Fotos já enviadas pra pasta assets/ — pra anexar uma foto num prato,
+// o Gastão/Fernanda escolhem aqui; fotos novas precisam ser enviadas
+// pro desenvolvedor primeiro e adicionadas nesta lista.
+const DISH_PHOTOS = [
+  { value: "feijoada da fe.jpeg", label: "Feijoada da Fê" },
+  { value: "panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg", label: "Panela Mar e Terra (foto 1)" },
+  { value: "panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 2.jpeg", label: "Panela Mar e Terra (foto 2)" },
+  { value: "risole de camarao com molho tartaro.jpeg", label: "Rissole de Camarão" },
+];
+
 function slugify(s) {
   return s.toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -810,7 +820,7 @@ function Admin() {
   const [editItem, setEditItem]     = useState(null);
   const [editForm, setEditForm]     = useState({});
   const [addingCat, setAddingCat]   = useState(null); // id da categoria onde está adicionando prato
-  const [newItem, setNewItem]       = useState({ name: "", desc: "", price: "", tag: "" });
+  const [newItem, setNewItem]       = useState({ name: "", desc: "", price: "", tag: "", img: "" });
   const [newCat, setNewCat]         = useState("");
   const [saveStatus, setSaveStatus] = useState("idle");
   const importRef = useRef(null);
@@ -934,14 +944,14 @@ function Admin() {
 
   const startAddItem = (catId) => {
     setAddingCat(catId);
-    setNewItem({ name: "", desc: "", price: "", tag: "" });
+    setNewItem({ name: "", desc: "", price: "", tag: "", img: "" });
     setEditItem(null);
   };
 
   const saveNewItem = () => {
     if (!newItem.name.trim()) { alert("Escreva pelo menos o nome do prato."); return; }
     updateSel({ items: [...sel.items, { cat: addingCat, ...newItem }] });
-    setNewItem({ name: "", desc: "", price: "", tag: "" });
+    setNewItem({ name: "", desc: "", price: "", tag: "", img: "" });
     setAddingCat(null);
   };
 
@@ -1218,6 +1228,16 @@ function Admin() {
                           ))}
                         </select>
                       </div>
+                      <div className="form-field">
+                        <label>Foto do prato (opcional)</label>
+                        <select value={editForm.img || ""} onChange={ef("img")}>
+                          <option value="">Sem foto</option>
+                          {DISH_PHOTOS.map(p => (
+                            <option key={p.value} value={p.value}>{p.label}</option>
+                          ))}
+                        </select>
+                        <span className="adm-hint">Só aparecem fotos já enviadas pro site</span>
+                      </div>
                     </div>
                     <div className="adm-form-btns">
                       <button className="adm-btn adm-btn-gold" onClick={saveEditItem}>✓ Salvar prato</button>
@@ -1230,6 +1250,7 @@ function Admin() {
                       <div className="adm-dish-name">
                         {it.name}
                         {it.tag ? <span className="menu-item-tag" style={{ marginLeft: 10 }}>{it.tag}</span> : null}
+                        {it.img ? <span className="adm-dish-photo-badge" title="Tem foto">📷</span> : null}
                       </div>
                       {it.desc ? <div className="adm-dish-desc">{it.desc}</div> : null}
                     </div>
@@ -1261,6 +1282,16 @@ function Admin() {
                     <div className="form-field">
                       <label>Etiqueta (opcional)</label>
                       <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex.: Autoral, Sáb & Dom" />
+                    </div>
+                    <div className="form-field">
+                      <label>Foto do prato (opcional)</label>
+                      <select value={newItem.img} onChange={nf("img")}>
+                        <option value="">Sem foto</option>
+                        {DISH_PHOTOS.map(p => (
+                          <option key={p.value} value={p.value}>{p.label}</option>
+                        ))}
+                      </select>
+                      <span className="adm-hint">Só aparecem fotos já enviadas pro site</span>
                     </div>
                   </div>
                   <div className="adm-form-btns">
