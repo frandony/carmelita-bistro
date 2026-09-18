@@ -555,6 +555,32 @@ function Cardapio({ go }) {
     return list;
   }, [menu]);
 
+  // ── Índice de categorias: pula pra seção e marca a ativa ao rolar ──
+  const [activeCat, setActiveCat] = useState(null);
+  const sectionRefs = useRef({});
+
+  useEffect(() => { setActiveCat(sections[0]?.id || null); }, [menu.id]);
+
+  useEffect(() => {
+    const els = Object.values(sectionRefs.current).filter(Boolean);
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveCat(e.target.dataset.catId);
+        });
+      },
+      { rootMargin: "-160px 0px -65% 0px", threshold: 0 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [sections]);
+
+  const jumpToCat = (catId) => {
+    const el = sectionRefs.current[catId];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="page page-enter">
       <section className="menu-hero">
@@ -601,22 +627,45 @@ function Cardapio({ go }) {
           <div className="menu-single-sub reveal">{menu.subtitle}</div>
         )}
 
+        {sections.length > 1 && (
+          <div className="menu-catnav-wrap">
+            <nav className="menu-catnav" aria-label="Categorias do cardápio">
+              {sections.map((sec) => (
+                <button key={sec.id}
+                        className={"menu-catnav-btn" + (activeCat === sec.id ? " active" : "")}
+                        onClick={() => jumpToCat(sec.id)}>
+                  {sec.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+        )}
+
         {sections.map((sec, si) => (
-          <div className={`menu-section reveal d${(si % 3) + 1}`} key={menu.id + sec.id}>
+          <div className={`menu-section reveal d${(si % 3) + 1}`} key={menu.id + sec.id}
+               data-cat-id={sec.id}
+               ref={(el) => { sectionRefs.current[sec.id] = el; }}>
             <div className="menu-section-head">
               <h2 className="menu-section-title">{sec.label}</h2>
               <span className="menu-section-rule"></span>
             </div>
             <div className="menu-list">
               {sec.items.map((it) => (
-                <div className="menu-row" key={it.name}>
-                  <div className="menu-row-top">
-                    <h3 className="menu-row-name">{it.name}</h3>
-                    {it.tag ? <span className="menu-item-tag">{it.tag}</span> : null}
-                    <span className="menu-row-leader"></span>
-                    <MenuPrice price={it.price} />
+                <div className={"menu-row" + (it.img ? " has-photo" : "")} key={it.name}>
+                  {it.img && (
+                    <div className="menu-row-thumb">
+                      <img src={encodeURI(`assets/${it.img}`)} alt={it.name} loading="lazy" />
+                    </div>
+                  )}
+                  <div className="menu-row-body">
+                    <div className="menu-row-top">
+                      <h3 className="menu-row-name">{it.name}</h3>
+                      {it.tag ? <span className="menu-item-tag">{it.tag}</span> : null}
+                      <span className="menu-row-leader"></span>
+                      <MenuPrice price={it.price} />
+                    </div>
+                    {it.desc ? <p className="menu-row-desc">{it.desc}</p> : null}
                   </div>
-                  {it.desc ? <p className="menu-row-desc">{it.desc}</p> : null}
                 </div>
               ))}
             </div>
