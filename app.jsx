@@ -767,7 +767,7 @@ function Reservas({ go }) {
                 <div className="form-eyebrow">Reservas · Somente por ligação</div>
                 <div className="form-title">Ligue e garanta<br/>sua mesa.</div>
                 <p className="call-text">
-                  Sem formulário, sem espera. A reserva do Carmelita é feita por telefone, direto com a casa — do nosso jeito, com conversa.
+                  Sem formulário, sem espera. A reserva do Carmelita é feita por telefone, direto com a casa — do jeito da casa, com conversa.
                 </p>
                 <a className="form-submit call-btn" href="tel:+5527997475391">
                   Ligar · (27) 99747-5391
