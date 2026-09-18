@@ -576,6 +576,14 @@ function Cardapio({ go }) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // Mantém o botão da categoria ativa centralizado na faixa de chips
+  // (que rola na horizontal), em vez de deixar ele cortado na borda
+  const catnavBtnRefs = useRef({});
+  useEffect(() => {
+    const btn = activeCat && catnavBtnRefs.current[activeCat];
+    if (btn) btn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [activeCat]);
+
   // ── Detecta o instante em que o índice gruda no topo, pra animar a chegada ──
   const [catnavStuck, setCatnavStuck] = useState(false);
   const catnavSentinelRef = useRef(null);
@@ -638,6 +646,7 @@ function Cardapio({ go }) {
               <nav className="menu-catnav" aria-label="Categorias do cardápio">
                 {sections.map((sec) => (
                   <button key={sec.id}
+                          ref={(el) => { catnavBtnRefs.current[sec.id] = el; }}
                           className={"menu-catnav-btn" + (activeCat === sec.id ? " active" : "")}
                           onClick={() => jumpToCat(sec.id)}>
                     {sec.label}
