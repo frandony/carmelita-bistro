@@ -1502,6 +1502,12 @@
 
     /* Índice de categorias — fica grudado no topo pra pular direto
        pra Entradas / Principais / Bebidas sem precisar rolar tudo */
+    /* Marcador invisível — quando ele sai da tela, o índice acabou
+       de grudar no topo, e é o gatilho pra animação de chegada */
+    .menu-catnav-sentinel {
+      height: 1px;
+    }
+
     .menu-catnav-wrap {
       position: sticky;
       top: 64px;
@@ -1756,6 +1762,24 @@
       .menu-catnav-btn {
         font-size: 10px;
         padding: 8px 14px;
+      }
+
+      /* Desliza suavemente pra dentro no instante em que gruda no
+         topo — só no mobile */
+      .menu-catnav-wrap.is-stuck .menu-catnav {
+        animation: catnavDock 0.55s var(--ease-luxury);
+      }
+
+      @keyframes catnavDock {
+        from {
+          transform: translateY(-16px) scale(0.96);
+          opacity: 0.3;
+        }
+
+        to {
+          transform: translateY(0) scale(1);
+          opacity: 1;
+        }
       }
 
       .menu-row-thumb {

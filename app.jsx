@@ -576,6 +576,21 @@ function Cardapio({ go }) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // ── Detecta o instante em que o índice gruda no topo, pra animar a chegada ──
+  const [catnavStuck, setCatnavStuck] = useState(false);
+  const catnavSentinelRef = useRef(null);
+
+  useEffect(() => {
+    const el = catnavSentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setCatnavStuck(!entry.isIntersecting),
+      { rootMargin: "-65px 0px 0px 0px", threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [sections]);
+
   // ── Lightbox: expande a foto do prato ao clicar ──
   const [lightbox, setLightbox] = useState(null); // { src, alt } | null
 
@@ -617,17 +632,20 @@ function Cardapio({ go }) {
         )}
 
         {sections.length > 1 && (
-          <div className="menu-catnav-wrap">
-            <nav className="menu-catnav" aria-label="Categorias do cardápio">
-              {sections.map((sec) => (
-                <button key={sec.id}
-                        className={"menu-catnav-btn" + (activeCat === sec.id ? " active" : "")}
-                        onClick={() => jumpToCat(sec.id)}>
-                  {sec.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+          <>
+            <div ref={catnavSentinelRef} className="menu-catnav-sentinel" aria-hidden="true"></div>
+            <div className={"menu-catnav-wrap" + (catnavStuck ? " is-stuck" : "")}>
+              <nav className="menu-catnav" aria-label="Categorias do cardápio">
+                {sections.map((sec) => (
+                  <button key={sec.id}
+                          className={"menu-catnav-btn" + (activeCat === sec.id ? " active" : "")}
+                          onClick={() => jumpToCat(sec.id)}>
+                    {sec.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </>
         )}
 
         {sections.map((sec, si) => (
