@@ -223,8 +223,6 @@ function Landing({ go }) {
       <section className="hero">
         <HeroBg />
         <div className="hero-content">
-          <div className="hero-eyebrow reveal">Restaurante & Bistrô · Praia da Costa, Vila Velha</div>
-
           <div className="hero-logo-group">
             <InlineLogo />
             <div className="hero-text-stack">
