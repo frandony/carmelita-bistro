@@ -514,6 +514,14 @@ function fetchPublishedMenus() {
     });
 }
 
+// Fotos de prato: campo "img" pode ser um nome de arquivo local (fotos
+// antigas, em assets/) ou uma URL completa (fotos enviadas pelo admin
+// via Supabase Storage).
+function resolveImg(img) {
+  if (!img) return "";
+  return /^https?:\/\//.test(img) ? img : encodeURI(`assets/${img}`);
+}
+
 // ====== Cardápio ======
 function MenuPrice({ price }) {
   return price
@@ -670,8 +678,8 @@ function Cardapio({ go }) {
                 <div className={"menu-row" + (it.img ? " has-photo" : "")} key={it.name}>
                   {it.img && (
                     <button className="menu-row-thumb" aria-label={`Ampliar foto de ${it.name}`}
-                            onClick={() => setLightbox({ src: encodeURI(`assets/${it.img}`), alt: it.name })}>
-                      <img src={encodeURI(`assets/${it.img}`)} alt={it.name} loading="lazy" />
+                            onClick={() => setLightbox({ src: resolveImg(it.img), alt: it.name })}>
+                      <img src={resolveImg(it.img)} alt={it.name} loading="lazy" />
                     </button>
                   )}
                   <div className="menu-row-body">
@@ -786,9 +794,8 @@ function Reservas({ go }) {
 }
 
 // ====== Admin ======
-// Fotos já enviadas pra pasta assets/ — pra anexar uma foto num prato,
-// o Gastão/Fernanda escolhem aqui; fotos novas precisam ser enviadas
-// pro desenvolvedor primeiro e adicionadas nesta lista.
+// Fotos antigas, enviadas direto na pasta assets/ do projeto (antes de
+// existir upload pelo painel) — ainda aparecem na galeria de seleção.
 const DISH_PHOTOS = [
   { value: "feijoada da fe.jpeg", label: "Feijoada da Fê" },
   { value: "panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg", label: "Panela Mar e Terra (foto 1)" },
@@ -796,10 +803,62 @@ const DISH_PHOTOS = [
   { value: "risole de camarao com molho tartaro.jpeg", label: "Rissole de Camarão" },
 ];
 
+const DISH_PHOTOS_BUCKET = "dish-photos";
+
 function slugify(s) {
   return s.toLowerCase()
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || ("c_" + Date.now());
+}
+
+// ====== Seletor de foto do prato: upload novo + galeria de já enviadas ======
+function PhotoPicker({ value, onChange, photos, uploading, onUpload }) {
+  const fileRef = useRef(null);
+
+  const handleFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Escolha um arquivo de imagem."); return; }
+    if (file.size > 8 * 1024 * 1024) { alert("A foto precisa ter até 8MB."); return; }
+    const url = await onUpload(file);
+    if (url) onChange(url);
+  };
+
+  return (
+    <div className="photo-picker">
+      {value ? (
+        <div className="photo-picker-current">
+          <img src={resolveImg(value)} alt="Foto escolhida" />
+          <button type="button" className="adm-btn adm-btn-line adm-btn-danger"
+                  onClick={() => onChange("")}>
+            Remover foto
+          </button>
+        </div>
+      ) : (
+        <p className="adm-hint" style={{ marginBottom: 10 }}>Nenhuma foto escolhida.</p>
+      )}
+
+      {photos.length > 0 && (
+        <div className="photo-picker-grid">
+          {photos.map((p) => (
+            <button type="button" key={p.key}
+                    className={"photo-picker-thumb" + (value === p.value ? " selected" : "")}
+                    title={p.label}
+                    onClick={() => onChange(p.value)}>
+              <img src={p.displayUrl} alt={p.label} loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
+      <button type="button" className="adm-btn adm-btn-line" disabled={uploading}
+              onClick={() => fileRef.current && fileRef.current.click()}>
+        {uploading ? "Enviando…" : "⬆️ Enviar nova foto"}
+      </button>
+    </div>
+  );
 }
 
 function Admin() {
@@ -825,12 +884,52 @@ function Admin() {
   const [saveStatus, setSaveStatus] = useState("idle");
   const importRef = useRef(null);
 
+  // ── Fotos: galeria (Storage + antigas em assets/) + upload ──
+  const [storagePhotos, setStoragePhotos] = useState([]);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const allPhotos = useMemo(() => [
+    ...DISH_PHOTOS.map((p) => ({ key: p.value, value: p.value, displayUrl: resolveImg(p.value), label: p.label })),
+    ...storagePhotos,
+  ], [storagePhotos]);
+
+  const uploadPhoto = async (file) => {
+    setUploadingPhoto(true);
+    const safeName = file.name.toLowerCase()
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .replace(/[^a-z0-9.]+/g, "-");
+    const path = `${Date.now()}-${safeName}`;
+    const { error } = await supabase.storage.from(DISH_PHOTOS_BUCKET).upload(path, file, { cacheControl: "3600" });
+    setUploadingPhoto(false);
+    if (error) { alert("Não foi possível enviar a foto: " + error.message); return null; }
+    const url = supabase.storage.from(DISH_PHOTOS_BUCKET).getPublicUrl(path).data.publicUrl;
+    setStoragePhotos((list) => [{ key: path, value: url, displayUrl: url, label: file.name }, ...list]);
+    return url;
+  };
+
   // ── Sessão (login) ──
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // ── Carrega a galeria de fotos já enviadas assim que loga ──
+  useEffect(() => {
+    if (!session) { setStoragePhotos([]); return; }
+    supabase.storage.from(DISH_PHOTOS_BUCKET)
+      .list("", { limit: 100, sortBy: { column: "created_at", order: "desc" } })
+      .then(({ data: files, error }) => {
+        if (error || !files) return;
+        const photos = files
+          .filter((f) => f.name && !f.name.startsWith("."))
+          .map((f) => {
+            const url = supabase.storage.from(DISH_PHOTOS_BUCKET).getPublicUrl(f.name).data.publicUrl;
+            return { key: f.name, value: url, displayUrl: url, label: f.name };
+          });
+        setStoragePhotos(photos);
+      });
+  }, [session]);
 
   // ── Carregar o cardápio publicado assim que loga ──
   useEffect(() => {
@@ -1228,15 +1327,11 @@ function Admin() {
                           ))}
                         </select>
                       </div>
-                      <div className="form-field">
+                      <div className="form-field" style={{ gridColumn: "1 / -1" }}>
                         <label>Foto do prato (opcional)</label>
-                        <select value={editForm.img || ""} onChange={ef("img")}>
-                          <option value="">Sem foto</option>
-                          {DISH_PHOTOS.map(p => (
-                            <option key={p.value} value={p.value}>{p.label}</option>
-                          ))}
-                        </select>
-                        <span className="adm-hint">Só aparecem fotos já enviadas pro site</span>
+                        <PhotoPicker value={editForm.img || ""}
+                                     onChange={(v) => setEditForm(f => ({ ...f, img: v }))}
+                                     photos={allPhotos} uploading={uploadingPhoto} onUpload={uploadPhoto} />
                       </div>
                     </div>
                     <div className="adm-form-btns">
@@ -1283,15 +1378,11 @@ function Admin() {
                       <label>Etiqueta (opcional)</label>
                       <input type="text" value={newItem.tag} onChange={nf("tag")} placeholder="Ex.: Autoral, Sáb & Dom" />
                     </div>
-                    <div className="form-field">
+                    <div className="form-field" style={{ gridColumn: "1 / -1" }}>
                       <label>Foto do prato (opcional)</label>
-                      <select value={newItem.img} onChange={nf("img")}>
-                        <option value="">Sem foto</option>
-                        {DISH_PHOTOS.map(p => (
-                          <option key={p.value} value={p.value}>{p.label}</option>
-                        ))}
-                      </select>
-                      <span className="adm-hint">Só aparecem fotos já enviadas pro site</span>
+                      <PhotoPicker value={newItem.img}
+                                   onChange={(v) => setNewItem(f => ({ ...f, img: v }))}
+                                   photos={allPhotos} uploading={uploadingPhoto} onUpload={uploadPhoto} />
                     </div>
                   </div>
                   <div className="adm-form-btns">
