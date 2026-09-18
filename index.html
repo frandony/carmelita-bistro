@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Great+Vibes&family=Allura&family=Oswald:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Raleway:wght@300;400&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Great+Vibes&family=Pinyon+Script&family=Oswald:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Raleway:wght@300;400&display=swap"
     rel="stylesheet" />
 
   <style>
@@ -38,7 +38,7 @@
       --font-display: "DM Serif Display", "Times New Roman", serif;
       --font-rock: "Oswald", "Arial Narrow", sans-serif;
       --font-body: "Cormorant Garamond", "Georgia", serif;
-      --font-script: "Allura", "Great Vibes", "Exmouth", cursive;
+      --font-script: "Pinyon Script", "Great Vibes", "Exmouth", cursive;
 
       /* Curva única de movimento — mesma base do scroll suave da Apple,
          usada em toda transição do site para o motion ficar coeso */
@@ -376,6 +376,9 @@
     @media (max-width: 880px) {
       .nav {
         padding: 14px 22px;
+        background: linear-gradient(to bottom, rgba(17, 17, 17, 0.92) 0%, rgba(17, 17, 17, 0.75) 60%, rgba(17, 17, 17, 0) 100%);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
       }
 
       .nav-brand {
