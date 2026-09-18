@@ -539,11 +539,6 @@ function Cardapio({ go }) {
   const [menuId, setMenuId] = useState(null);
   const menu = menus.find((m) => m.id === menuId) || menus[0] || { categories: [], items: [] };
 
-  const featured = useMemo(
-    () => menus.flatMap((m) => m.items.filter((it) => it.img)),
-    [menus]
-  );
-
   const sections = useMemo(() => {
     const cats = menu.categories.filter((c) => c.id !== "all");
     const known = new Set(cats.map((c) => c.id));
@@ -581,6 +576,16 @@ function Cardapio({ go }) {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // ── Lightbox: expande a foto do prato ao clicar ──
+  const [lightbox, setLightbox] = useState(null); // { src, alt } | null
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (e) => { if (e.key === "Escape") setLightbox(null); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [lightbox]);
+
   return (
     <div className="page page-enter">
       <section className="menu-hero">
@@ -594,22 +599,6 @@ function Cardapio({ go }) {
       </section>
 
       <section className="container menu-editorial">
-        {featured.length > 0 && (
-          <div className="menu-featured reveal">
-            <div className="menu-featured-grid">
-              {featured.map((it) => (
-                <figure className="featured-card" key={it.name}>
-                  <img className="featured-photo" src={encodeURI(`assets/${it.img}`)} alt={it.name} />
-                  <figcaption className="featured-caption">
-                    {it.tag ? <span className="featured-tag">{it.tag}</span> : null}
-                    <span className="featured-name">{it.name}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        )}
-
         {menus.length > 1 && (
           <div className="menu-switch reveal">
             {menus.map((m) => (
@@ -653,9 +642,10 @@ function Cardapio({ go }) {
               {sec.items.map((it) => (
                 <div className={"menu-row" + (it.img ? " has-photo" : "")} key={it.name}>
                   {it.img && (
-                    <div className="menu-row-thumb">
+                    <button className="menu-row-thumb" aria-label={`Ampliar foto de ${it.name}`}
+                            onClick={() => setLightbox({ src: encodeURI(`assets/${it.img}`), alt: it.name })}>
                       <img src={encodeURI(`assets/${it.img}`)} alt={it.name} loading="lazy" />
-                    </div>
+                    </button>
                   )}
                   <div className="menu-row-body">
                     <div className="menu-row-top">
@@ -687,6 +677,14 @@ function Cardapio({ go }) {
           </div>
         </div>
       </section>
+
+      {lightbox && (
+        <div className="lightbox" onClick={() => setLightbox(null)}>
+          <button className="lightbox-close" aria-label="Fechar" onClick={() => setLightbox(null)}>×</button>
+          <img className="lightbox-img" src={lightbox.src} alt={lightbox.alt}
+               onClick={(e) => e.stopPropagation()} />
+        </div>
+      )}
 
       <Footer go={go} />
     </div>

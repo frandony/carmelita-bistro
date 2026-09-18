@@ -1553,87 +1553,6 @@
       background: var(--bronze-glow);
     }
 
-    /* Faixa de destaques (pratos-assinatura com foto) */
-    .menu-featured {
-      margin: 6px 0 54px;
-    }
-
-    .menu-featured-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .featured-card {
-      position: relative;
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
-      border: 1px solid rgba(216, 199, 174, 0.14);
-      background: var(--grafite);
-    }
-
-    .featured-photo {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: brightness(0.86) saturate(0.95);
-      transition: transform 1s var(--ease-luxury), filter 0.6s var(--ease-luxury);
-    }
-
-    .featured-card:hover .featured-photo {
-      transform: scale(1.045);
-      filter: brightness(0.95) saturate(1);
-    }
-
-    .featured-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 45%, rgba(17, 17, 17, 0.85) 100%);
-      pointer-events: none;
-    }
-
-    .featured-caption {
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 16px;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .featured-tag {
-      align-self: flex-start;
-      font-family: var(--font-rock);
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--azul-glow);
-      border: 1px solid rgba(37, 150, 209, 0.35);
-      padding: 3px 8px;
-    }
-
-    .featured-name {
-      font-family: var(--font-display);
-      font-size: 22px;
-      line-height: 1.15;
-      color: var(--off-white);
-    }
-
-    @media (max-width: 700px) {
-      .menu-featured-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      .featured-card {
-        aspect-ratio: 4 / 3;
-      }
-    }
-
     /* Seções por categoria */
     .menu-section {
       margin-bottom: 76px;
@@ -1679,10 +1598,18 @@
       flex-shrink: 0;
       width: 76px;
       height: 76px;
+      padding: 0;
       border-radius: 6px;
       overflow: hidden;
       border: 1px solid rgba(216, 199, 174, 0.18);
       background: var(--grafite);
+      cursor: zoom-in;
+      transition: border-color 0.4s var(--ease-luxury);
+    }
+
+    .menu-row-thumb:hover,
+    .menu-row-thumb:focus-visible {
+      border-color: var(--bronze-glow);
     }
 
     .menu-row-thumb img {
@@ -1694,8 +1621,53 @@
       transition: transform 0.8s var(--ease-luxury);
     }
 
-    .menu-row:hover .menu-row-thumb img {
+    .menu-row:hover .menu-row-thumb img,
+    .menu-row-thumb:hover img {
       transform: scale(1.08);
+    }
+
+    /* Lightbox — expande a foto do prato */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background: rgba(8, 6, 4, 0.92);
+      backdrop-filter: blur(6px);
+      cursor: zoom-out;
+      animation: lightboxIn 0.35s var(--ease-luxury);
+    }
+
+    @keyframes lightboxIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .lightbox-img {
+      max-width: min(90vw, 720px);
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+      cursor: default;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      font-size: 32px;
+      line-height: 1;
+      color: var(--off-white);
+      padding: 8px;
+      transition: color 0.3s var(--ease-luxury);
+    }
+
+    .lightbox-close:hover {
+      color: var(--bronze-glow);
     }
 
     .menu-row-body {
