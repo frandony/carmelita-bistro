@@ -234,8 +234,7 @@ function Landing({ go }) {
             Cozinha autoral.
           </p>
           <p className="hero-verse reveal d5">
-            A gente não quer só comida, a gente quer bebida, diversão, balé<br/>
-            A gente não quer só comida, a gente quer a vida como a vida quer.
+            A gente não quer só comida, a gente quer bebida, diversão, balé. A gente não quer só comida, a gente quer a vida como a vida quer.
             <span className="hero-verse-author">Titãs</span>
           </p>
           <div className="hero-ctas reveal d6">
