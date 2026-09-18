@@ -48,6 +48,7 @@ function Nav({ route, go, onCta }) {
   const [overHero, setOverHero] = useState(route === "home");
   const [mobile, setMobile] = useState(false);
   const menuRef = useRef(null);
+  const burgerRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -66,7 +67,11 @@ function Nav({ route, go, onCta }) {
   // Fecha ao clicar fora ou apertar Esc — sem precisar de um fundo escurecendo a tela
   useEffect(() => {
     if (!mobile) return;
-    const onClick = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMobile(false); };
+    const onClick = (e) => {
+      if (menuRef.current && menuRef.current.contains(e.target)) return;
+      if (burgerRef.current && burgerRef.current.contains(e.target)) return;
+      setMobile(false);
+    };
     const onKey = (e) => { if (e.key === "Escape") setMobile(false); };
     document.addEventListener("mousedown", onClick);
     document.addEventListener("keydown", onKey);
@@ -106,6 +111,7 @@ function Nav({ route, go, onCta }) {
           </div>
         </div>
         <button className={"nav-burger" + (mobile ? " open" : "")}
+                ref={burgerRef}
                 onClick={() => setMobile((m) => !m)}
                 aria-label="Menu" aria-expanded={mobile}>
           <span></span><span></span><span></span>
