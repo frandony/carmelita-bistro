@@ -461,9 +461,15 @@
       position: absolute;
       inset: 0;
       z-index: 1;
-      background-size: 120%;
+      background-size: cover;
+      background-repeat: no-repeat;
       background-position: center;
       background-attachment: fixed;
+      /* zoom leve via transform, não via background-size em % —
+         background-size:120% sem altura garantida pode sobrar
+         espaço vertical e o background-repeat (padrão) ladrilha a
+         foto, duplicando ela várias vezes */
+      transform: scale(1.2);
       opacity: 0;
       transition: opacity 2.4s ease-in-out;
     }
