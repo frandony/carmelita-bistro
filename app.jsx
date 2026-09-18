@@ -110,7 +110,12 @@ function Nav({ route, go, onCta }) {
                 aria-label="Menu" aria-expanded={mobile}>
           <span></span><span></span><span></span>
         </button>
+        <div className={"mobile-menu-backdrop" + (mobile ? " open" : "")} aria-hidden="true"></div>
         <div className={"mobile-menu" + (mobile ? " open" : "")} ref={menuRef}>
+          <div className="mobile-menu-brand">
+            <span className="nav-brand-text">Carmelita</span>
+            <span className="nav-brand-resto">Restô</span>
+          </div>
           {links.map((l) => (
             <a key={l.id}
                className={"mobile-menu-link" + (route === l.id ? " active" : "")}

@@ -269,49 +269,76 @@
       }
     }
 
-    /* Dropdown discreto, ancorado no hambúrguer — não toma a tela toda */
+    /* Fundo escurecido atrás da gaveta */
+    .mobile-menu-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 205;
+      background: rgba(10, 8, 6, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s var(--ease-luxury);
+    }
+
+    .mobile-menu-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Gaveta lateral — cartão deslizando da direita, cobrindo boa
+       parte da tela (não a tela inteira) */
     .mobile-menu {
-      position: absolute;
-      top: 100%;
-      right: 14px;
-      margin-top: 10px;
-      z-index: 200;
-      min-width: 210px;
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100dvh;
+      width: min(80vw, 360px);
+      z-index: 210;
       background: var(--grafite-soft);
-      border: 1px solid rgba(138, 106, 68, 0.3);
-      border-radius: 10px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-      padding: 8px;
+      border-left: 1px solid rgba(138, 106, 68, 0.25);
+      box-shadow: -30px 0 70px rgba(0, 0, 0, 0.55);
+      padding: 90px 28px 28px;
       display: flex;
       flex-direction: column;
-      opacity: 0;
-      transform: translateY(-8px) scale(0.97);
-      transform-origin: top right;
+      gap: 2px;
+      overflow-y: auto;
+      transform: translateX(100%);
       pointer-events: none;
-      transition: opacity 0.35s var(--ease-luxury), transform 0.35s var(--ease-luxury);
+      transition: transform 0.5s var(--ease-luxury);
     }
 
     .mobile-menu.open {
-      opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: translateX(0);
       pointer-events: auto;
+    }
+
+    .mobile-menu-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .mobile-menu-brand .nav-brand-text {
+      font-size: 28px;
     }
 
     .mobile-menu-link {
       display: block;
-      padding: 12px 14px;
+      padding: 15px 12px;
       font-family: var(--font-rock);
-      font-size: 13px;
-      letter-spacing: 0.16em;
+      font-size: 16px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--off-white);
       border-radius: 6px;
+      border-bottom: 1px solid rgba(216, 199, 174, 0.08);
       transition: background 0.3s var(--ease-luxury), color 0.3s var(--ease-luxury);
     }
 
     .mobile-menu-link:hover,
     .mobile-menu-link:focus-visible {
-      background: rgba(138, 106, 68, 0.16);
+      background: rgba(138, 106, 68, 0.14);
       color: var(--bronze-glow);
     }
 
@@ -322,26 +349,26 @@
     .mobile-menu-divider {
       height: 1px;
       background: rgba(216, 199, 174, 0.14);
-      margin: 6px 6px;
+      margin: 14px 12px;
     }
 
     .mobile-menu-phone {
       display: block;
-      padding: 10px 14px 2px;
+      padding: 0 12px 4px;
       font-family: var(--font-rock);
-      font-size: 12px;
-      letter-spacing: 0.1em;
+      font-size: 15px;
+      letter-spacing: 0.08em;
       color: var(--bege-areia);
     }
 
     .mobile-menu-hours {
-      padding: 4px 14px 8px;
+      padding: 6px 12px 0;
       font-family: var(--font-rock);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: rgba(244, 240, 234, 0.45);
-      line-height: 1.8;
+      line-height: 2;
     }
 
     @media (max-width: 880px) {
@@ -368,7 +395,7 @@
         padding: 6px;
         margin-left: auto;
         position: relative;
-        z-index: 201;
+        z-index: 220;
       }
 
       .nav-burger span {
