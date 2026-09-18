@@ -160,6 +160,12 @@
       color: rgba(244, 240, 234, 0.6);
     }
 
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+
     .nav-right {
       display: flex;
       align-items: center;
@@ -181,18 +187,16 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 44px;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      gap: 34px;
     }
 
     .nav-link {
       font-family: var(--font-rock);
       font-size: 13px;
-      letter-spacing: 0.32em;
+      font-weight: 300;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--off-white);
+      color: rgba(244, 240, 234, 0.85);
       position: relative;
       padding: 6px 0;
       transition: color 0.5s var(--ease-luxury);
@@ -237,7 +241,7 @@
       display: none;
     }
 
-    /* Notebook: evita colisão entre marca, links centrais e ações à direita */
+    /* Notebook: aperta o espaçamento pra caber tudo confortavelmente */
     @media (max-width: 1200px) and (min-width: 881px) {
       .nav {
         padding: 16px 28px;
@@ -247,13 +251,17 @@
         display: none;
       }
 
-      .nav-links {
+      .nav-menu {
         gap: 26px;
+      }
+
+      .nav-links {
+        gap: 22px;
       }
 
       .nav-link {
         font-size: 12px;
-        letter-spacing: 0.24em;
+        letter-spacing: 0.14em;
       }
 
       .nav-brand-text {
@@ -430,15 +438,6 @@
         background-attachment: scroll;
         background-size: cover, cover, cover, cover;
       }
-    }
-
-    .hero-bg::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(90deg, rgba(244, 240, 234, 0.018) 0 1px, transparent 1px 80px),
-        repeating-linear-gradient(0deg, rgba(244, 240, 234, 0.018) 0 1px, transparent 1px 80px);
     }
 
     .hero-content {

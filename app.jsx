@@ -90,18 +90,20 @@ function Nav({ route, go, onCta }) {
           <span className="nav-brand-text">Carmelita</span>
           <span className="nav-brand-resto">Restô</span>
         </div>
-        <div className="nav-links">
-          {links.map((l) => (
-            <a key={l.id}
-               className={"nav-link" + (route === l.id ? " active" : "")}
-               onClick={(e) => { e.preventDefault(); go(l.id); }}>
-              {l.label}
-            </a>
-          ))}
-        </div>
-        <div className="nav-right">
-          <a className="nav-phone" href="tel:+5527997475391">(27) 99747-5391</a>
-          <button className="nav-cta" onClick={onCta}>Reservas</button>
+        <div className="nav-menu">
+          <div className="nav-links">
+            {links.map((l) => (
+              <a key={l.id}
+                 className={"nav-link" + (route === l.id ? " active" : "")}
+                 onClick={(e) => { e.preventDefault(); go(l.id); }}>
+                {l.label}
+              </a>
+            ))}
+          </div>
+          <div className="nav-right">
+            <a className="nav-phone" href="tel:+5527997475391">(27) 99747-5391</a>
+            <button className="nav-cta" onClick={onCta}>Reservas</button>
+          </div>
         </div>
         <button className={"nav-burger" + (mobile ? " open" : "")}
                 onClick={() => setMobile((m) => !m)}
