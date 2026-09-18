@@ -26,7 +26,8 @@ function HeroBg() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return; // não fica trocando imagem sozinho para quem pediu menos movimento
+    const mobile = window.matchMedia("(max-width: 700px)").matches;
+    if (reduced || !mobile) return; // carrossel só no mobile — desktop fica com 1 foto fixa
     const t = setInterval(() => setIndex((i) => (i + 1) % HERO_BG_IMAGES.length), 6000);
     return () => clearInterval(t);
   }, []);
