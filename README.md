@@ -18,9 +18,6 @@ app.js                 app.jsx compilado — gerado pelo compilar.cmd, não edit
 compilar.cmd           recompila app.jsx -> app.js
 menu.json              cardápio (menus, categorias, itens)
 assets/                logos e imagens
-PALETA-ALTERNATIVA-DOURADO.txt   nota de design (paleta de cores alternativa)
-RECOMENDACOES.txt      decisões de conteúdo (ex.: por que o cardápio ainda não tem fotos)
-SEGURANCA.txt          plano de migração do login do admin para Supabase Auth
 ```
 
 ## Como rodar localmente
@@ -36,5 +33,10 @@ Ou abra `index.html` diretamente no navegador.
 O login usa **Supabase Auth** (e-mail + senha, verificado no servidor — a
 senha nunca aparece no código do site). O cardápio fica numa tabela
 (`site_menus`) protegida por Row Level Security: qualquer visitante lê,
-só quem estiver logado grava. Detalhes e checklist de segurança em
-`SEGURANCA.txt`.
+só quem estiver logado grava. O cadastro público de usuários fica
+desligado no Supabase — contas de admin são criadas só pelo painel.
+
+Regras: a chave `anon` pode ficar no site (é pública por natureza); a
+`service_role` e qualquer senha **nunca** entram no código nem no git.
+Anotações internas ficam na pasta `notas-internas/`, que é ignorada pelo
+git e não vai para o site.
