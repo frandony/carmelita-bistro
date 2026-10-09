@@ -15,7 +15,7 @@ function InlineLogo() {
 
 // ====== Fundo da hero — carrossel com crossfade suave ======
 const HERO_BG_IMAGES = [
-  "assets/Parte de fundo do site do carmelita.png",
+  "assets/salao-carmelita.webp",
   "assets/feijoada da fe.jpeg",
   "assets/panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 1.jpg",
   "assets/risole de camarao com molho tartaro.jpeg",
@@ -23,18 +23,21 @@ const HERO_BG_IMAGES = [
 
 function HeroBg() {
   const [index, setIndex] = useState(0);
+  // carrossel só no mobile — desktop fica com 1 foto fixa (e nem baixa as outras)
+  const [carousel] = useState(() =>
+    window.matchMedia("(max-width: 700px)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const images = carousel ? HERO_BG_IMAGES : HERO_BG_IMAGES.slice(0, 1);
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const mobile = window.matchMedia("(max-width: 700px)").matches;
-    if (reduced || !mobile) return; // carrossel só no mobile — desktop fica com 1 foto fixa
+    if (!carousel) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % HERO_BG_IMAGES.length), 6000);
     return () => clearInterval(t);
-  }, []);
+  }, [carousel]);
 
   return (
     <div className="hero-bg">
-      {HERO_BG_IMAGES.map((src, i) => (
+      {images.map((src, i) => (
         <div key={src}
              className={"hero-bg-slide" + (i === index ? " active" : "")}
              style={{ backgroundImage: `url("${encodeURI(src)}")` }} />
@@ -61,16 +64,56 @@ function useReveal() {
   });
 }
 
-// ====== Placeholder tiles ======
-function Placeholder({ kind = "stripes", label, note }) {
-  return (
-    <div className={`ph ph-${kind}`}>
-      <div style={{ textAlign: "center", padding: 16 }}>
-        <div className="ph-meta">{label}</div>
-        {note ? <div className="ph-meta" style={{ marginTop: 6, opacity: 0.55 }}>{note}</div> : null}
-      </div>
-    </div>
-  );
+// ====== Hero: conteúdo desce de leve e esmaece conforme a página rola ======
+// Só publica o progresso (0 → 1) na variável --hero-p; o efeito é todo CSS.
+function useHeroScroll(ref) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const p = Math.min(1, Math.max(0, window.scrollY / el.offsetHeight));
+      el.style.setProperty("--hero-p", p.toFixed(3));
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+}
+
+// ====== Nota que conta de 0 até o valor ("4,8") quando entra na tela ======
+function CountUp({ value }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(value);
+
+  useEffect(() => {
+    const el = ref.current;
+    const target = parseFloat(value.replace(",", "."));
+    if (!el || isNaN(target) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setShown("0,0");
+    let raf = 0;
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min(1, (now - start) / 1600);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setShown((target * eased).toFixed(1).replace(".", ","));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, { threshold: 0.6 });
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [value]);
+
+  return <span ref={ref}>{shown}</span>;
 }
 
 // ====== Nav ======
@@ -122,14 +165,16 @@ function Nav({ route, go, onCta }) {
   return (
     <>
       <nav className={"nav" + (scrolled ? " scrolled" : "")}>
-        <div className={"nav-brand" + (overHero ? " discreet" : "")} onClick={() => go("home")}>
+        <a className={"nav-brand" + (overHero ? " discreet" : "")} href="#home"
+           aria-label="Carmelita Restô — início"
+           onClick={(e) => { e.preventDefault(); go("home"); }}>
           <span className="nav-brand-text">Carmelita</span>
           <span className="nav-brand-resto">Restô</span>
-        </div>
+        </a>
         <div className="nav-menu">
           <div className="nav-links">
             {links.map((l) => (
-              <a key={l.id}
+              <a key={l.id} href={"#" + l.id}
                  className={"nav-link" + (route === l.id ? " active" : "")}
                  onClick={(e) => { e.preventDefault(); go(l.id); }}>
                 {l.label}
@@ -154,7 +199,7 @@ function Nav({ route, go, onCta }) {
             <span className="nav-brand-resto">Restô</span>
           </div>
           {links.map((l) => (
-            <a key={l.id}
+            <a key={l.id} href={"#" + l.id}
                className={"mobile-menu-link" + (route === l.id ? " active" : "")}
                onClick={(e) => { e.preventDefault(); go(l.id); setMobile(false); }}>
               {l.label}
@@ -217,10 +262,12 @@ function Footer({ go }) {
 // ====== Landing ======
 function Landing({ go }) {
   useReveal();
+  const heroRef = useRef(null);
+  useHeroScroll(heroRef);
   return (
     <div className="page page-enter">
       {/* HERO */}
-      <section className="hero">
+      <section className="hero" ref={heroRef}>
         <HeroBg />
         <div className="hero-content">
           <div className="hero-logo-group">
@@ -247,6 +294,7 @@ function Landing({ go }) {
           <span className="hero-meta-item"><span className="dot"></span>Qui a Dom · Reservas por ligação</span>
           <span className="hero-meta-item">Cheff Gastão · cozinha autoral</span>
         </div>
+        <span className="hero-scroll" aria-hidden="true"></span>
       </section>
 
       {/* DIFERENCIAIS */}
@@ -308,7 +356,7 @@ function Landing({ go }) {
 
           <div className="mood-grid">
             <div className="mood-tile t1 reveal d1">
-              <img className="mood-photo" src="assets/Parte de fundo do site do carmelita.png"
+              <img className="mood-photo" src="assets/salao-carmelita-recorte.webp"
                    alt="Salão do Carmelita — mesas de madeira e quadros de músicos na parede" loading="lazy" />
               <span className="mood-label">Salão</span>
             </div>
@@ -318,7 +366,8 @@ function Landing({ go }) {
               <span className="mood-label">Prato</span>
             </div>
             <div className="mood-tile t3 reveal d3">
-              <Placeholder kind="stripes" label="03 · Decoração" note="referência · quadros" />
+              <img className="mood-photo" src="assets/salao-quadros.webp"
+                   alt="Quadros de músicos na parede do salão" loading="lazy" />
               <span className="mood-label">Arte</span>
             </div>
             <div className="mood-tile t4 reveal d2">
@@ -327,8 +376,9 @@ function Landing({ go }) {
               <span className="mood-label">Fim de semana</span>
             </div>
             <div className="mood-tile t5 reveal d3">
-              <Placeholder kind="warm" label="05 · Coxinha de rabada" note="autoral · banana da terra" />
-              <span className="mood-label">Petisco</span>
+              <img className="mood-photo" src={encodeURI("assets/panela mar e terra camarao salteados fritas com parmesao e mignon com chimichurri foto 2.jpeg")}
+                   alt="Panela Mar e Terra vista de cima — mignon, fritas com parmesão e camarões" loading="lazy" />
+              <span className="mood-label">Mar e terra</span>
             </div>
             <div className="mood-tile t6 reveal d4">
               <img className="mood-photo" src={encodeURI("assets/risole de camarao com molho tartaro.jpeg")}
@@ -418,7 +468,7 @@ function Sobre({ go }) {
         <div className="container">
           <div className="sobre-editorial">
             <div className="chef-photo reveal">
-              <img className="chef-photo-img" src="assets/Parte de fundo do site do carmelita.png"
+              <img className="chef-photo-img" src="assets/salao-carmelita-recorte.webp"
                    alt="Salão do Carmelita — quadros de músicos na parede e mesas postas" loading="lazy" />
               <div className="chef-photo-caption">
                 O salão
@@ -456,11 +506,11 @@ function Sobre({ go }) {
           <span className="block-eyebrow reveal"><span className="num">B /</span>Reconhecimento</span>
           <h2 className="block-title reveal d1">Uma casa <em>que os clientes escolhem de volta.</em></h2>
 
-          <div className="timeline-track">
+          <div className="timeline-track reveal">
             {reconhecimentos.map((r, i) => (
               <div className={`tl-item reveal d${i+1}`} key={r.num}>
                 <div className="tl-dot"></div>
-                <div className="tl-year" style={{ fontSize: "2rem" }}>{r.num}</div>
+                <div className="tl-year" style={{ fontSize: "2rem" }}><CountUp value={r.num} /></div>
                 <div className="tl-tag">{r.label}</div>
                 <div className="tl-text">{r.sub}</div>
               </div>

@@ -5,15 +5,17 @@ Site institucional do Carmelita Bistrô (Praia da Costa, Vila Velha/ES): landing
 ## Tecnologias
 
 - **React 18** + **ReactDOM**, carregados via CDN (sem bundler/`npm install`)
-- **Babel Standalone** para compilar o JSX no navegador (`<script type="text/babel" src="app.jsx">`)
+- JSX pré-compilado: o código-fonte é o `app.jsx`, mas o site carrega o `app.js`. **Depois de editar o `app.jsx`, rode `compilar.cmd`** (usa `npx esbuild`, precisa de Node) e faça commit dos dois arquivos
 - **Supabase** (Auth + Postgres) para login do admin e para o cardápio publicado (tabela `site_menus`, RLS ligado — leitura pública, escrita só autenticado). `menu.json` e o bloco `#menu-data` do `index.html` viram fallback caso o banco esteja fora do ar
 - CSS puro, com fontes customizadas (DM Serif Display, Great Vibes, Pinyon Script, Oswald, Cormorant Garamond, Raleway)
 
 ## Estrutura
 
 ```
-index.html            shell + tags <script> (React/Babel) + dados iniciais do cardápio (#menu-data)
-app.jsx                Landing, Sobre, Cardápio, Reservas e painel Admin
+index.html            shell + tags <script> (React) + dados iniciais do cardápio (#menu-data)
+app.jsx                Landing, Sobre, Cardápio, Reservas e painel Admin (código-fonte)
+app.js                 app.jsx compilado — gerado pelo compilar.cmd, não editar à mão
+compilar.cmd           recompila app.jsx -> app.js
 menu.json              cardápio (menus, categorias, itens)
 assets/                logos e imagens
 PALETA-ALTERNATIVA-DOURADO.txt   nota de design (paleta de cores alternativa)

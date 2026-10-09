@@ -7,6 +7,7 @@
   <title>Carmelita Restaurante & Bistrô — Praia da Costa, Vila Velha/ES</title>
   <meta name="description"
     content="Restaurante e bistrô intimista na Praia da Costa, Vila Velha/ES. Culinária autoral do Cheff Gastão. Qui e Sex 19h–23h · Sáb e Dom 12h–16h. Reservas somente por ligação: (27) 99747-5391." />
+  <link rel="preload" as="image" href="assets/salao-carmelita.webp" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -212,7 +213,9 @@
       color: var(--bronze-glow);
     }
 
-    .nav-link.active::after {
+    /* Filete sob o link: cresce a partir do centro no hover e
+       fica fixo na página ativa */
+    .nav-link::after {
       content: "";
       position: absolute;
       left: 50%;
@@ -220,7 +223,13 @@
       width: 18px;
       height: 1px;
       background: var(--bronze-rock);
-      transform: translateX(-50%);
+      transform: translateX(-50%) scaleX(0);
+      transition: transform 0.5s var(--ease-luxury);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      transform: translateX(-50%) scaleX(1);
     }
 
     .nav-cta {
@@ -231,16 +240,29 @@
       color: var(--off-white);
       border: 1px solid var(--bronze-rock);
       padding: 11px 22px;
-      transition: background 0.5s var(--ease-luxury), color 0.5s var(--ease-luxury);
+      /* Preenchimento bronze sobe de baixo pra cima no hover */
+      background: linear-gradient(var(--bronze-rock), var(--bronze-rock)) no-repeat center bottom / 100% 0%;
+      transition: background-size 0.5s var(--ease-luxury), color 0.5s var(--ease-luxury);
     }
 
     .nav-cta:hover {
-      background: var(--bronze-rock);
+      background-size: 100% 100%;
       color: var(--off-white);
     }
 
     .nav-burger {
       display: none;
+    }
+
+    /* Desktop: barra rolada vira vidro fosco em vez de preto chapado.
+       Só acima de 880px — no mobile a gaveta (position:fixed) mora
+       dentro da .nav */
+    @media (min-width: 881px) {
+      .nav.scrolled {
+        background: rgba(17, 17, 17, 0.82);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
     }
 
     /* Notebook: aperta o espaçamento pra caber tudo confortavelmente */
@@ -306,12 +328,17 @@
       overflow-y: auto;
       transform: translateX(100%);
       pointer-events: none;
-      transition: transform 0.5s var(--ease-luxury);
+      /* fechada, sai também da navegação por teclado (some só depois
+         de terminar de deslizar pra fora) */
+      visibility: hidden;
+      transition: transform 0.5s var(--ease-luxury), visibility 0s 0.5s;
     }
 
     .mobile-menu.open {
       transform: translateX(0);
       pointer-events: auto;
+      visibility: visible;
+      transition: transform 0.5s var(--ease-luxury);
     }
 
     .mobile-menu-brand {
@@ -499,11 +526,33 @@
       }
     }
 
+    /* Desktop tem uma foto só, parada — um zoom bem lento dá vida
+       sem distrair (no mobile o carrossel já faz esse papel) */
+    @media (min-width: 881px) {
+      .hero-bg-slide {
+        animation: heroDrift 32s ease-in-out infinite alternate;
+      }
+    }
+
+    @keyframes heroDrift {
+      from {
+        transform: scale(1.2);
+      }
+
+      to {
+        transform: scale(1.3) translate3d(-1.2%, -1%, 0);
+      }
+    }
+
+    /* --hero-p (0 → 1) é o quanto a hero já rolou pra fora da tela,
+       atualizado via JS: o conteúdo desce de leve e esmaece */
     .hero-content {
       position: relative;
       text-align: center;
       padding: 0 24px;
       z-index: 2;
+      transform: translate3d(0, calc(var(--hero-p, 0) * 80px), 0);
+      opacity: calc(1 - var(--hero-p, 0) * 1.6);
     }
 
     .hero-eyebrow {
@@ -559,7 +608,11 @@
       letter-spacing: -0.01em;
       line-height: 0.95;
       padding: 0;
-      background: linear-gradient(148deg,
+      /* 1ª camada: faixa de brilho que atravessa as letras de tempos
+         em tempos · 2ª camada: o dourado de sempre */
+      background:
+        linear-gradient(105deg, transparent 44%, rgba(255, 252, 236, 0.9) 50%, transparent 56%) no-repeat 150% 0 / 250% 100%,
+        linear-gradient(148deg,
           #b07c2a 0%,
           #e8d48a 20%,
           #faf2d8 38%,
@@ -578,7 +631,18 @@
       overflow-wrap: anywhere;
       filter:
         drop-shadow(0 0 22px rgba(212, 168, 60, 0.28)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.32));
-      animation: wordmarkGlow 5s ease-in-out infinite;
+      animation: wordmarkGlow 5s ease-in-out infinite, wordmarkShine 9s ease-in-out 3s infinite;
+    }
+
+    @keyframes wordmarkShine {
+      0% {
+        background-position: 150% 0, 0 0;
+      }
+
+      30%,
+      100% {
+        background-position: -50% 0, 0 0;
+      }
     }
 
     @keyframes wordmarkGlow {
@@ -682,6 +746,25 @@
       margin-bottom: 80px;
     }
 
+    /* Reflexo que cruza o botão no hover (só na ida — sem transição
+       na volta, senão ele passaria de novo ao tirar o mouse) */
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -60%;
+      width: 40%;
+      background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+      transform: skewX(-18deg);
+      pointer-events: none;
+    }
+
+    .btn:hover::after {
+      left: 125%;
+      transition: left 0.9s var(--ease-luxury);
+    }
+
     .btn-primary {
       background: var(--off-white);
       color: var(--preto-vintage);
@@ -714,6 +797,49 @@
       justify-content: space-between;
       padding: 0 48px;
       z-index: 2;
+      opacity: calc(1 - var(--hero-p, 0) * 3);
+    }
+
+    /* Convite pra rolar: filete com um ponto de luz descendo.
+       Só em telas grandes, onde sobra espaço abaixo dos botões */
+    .hero-scroll {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      width: 1px;
+      height: 46px;
+      background: rgba(216, 199, 174, 0.18);
+      overflow: hidden;
+      z-index: 2;
+      opacity: calc(1 - var(--hero-p, 0) * 6);
+    }
+
+    .hero-scroll::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 45%;
+      background: linear-gradient(to bottom, transparent, var(--bronze-glow));
+      animation: scrollCue 2.6s var(--ease-luxury) infinite;
+    }
+
+    @keyframes scrollCue {
+      from {
+        transform: translateY(-100%);
+      }
+
+      to {
+        transform: translateY(230%);
+      }
+    }
+
+    @media (min-width: 1367px) and (min-height: 820px) {
+      .hero-scroll {
+        display: block;
+      }
     }
 
     .hero-meta-item {
@@ -919,6 +1045,24 @@
       background: rgba(138, 106, 68, 0.06);
     }
 
+    /* Filete dourado que se desenha no topo do card no hover */
+    .diff::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--bronze-glow);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.8s var(--ease-luxury);
+    }
+
+    .diff:hover::before {
+      transform: scaleX(1);
+    }
+
     .diff-num {
       font-family: var(--font-display);
       font-style: italic;
@@ -1038,9 +1182,20 @@
       transition: filter 0.6s var(--ease-luxury), transform 1s var(--ease-luxury);
     }
 
-    .mood-tile:hover .mood-photo {
+    /* A foto entra ampliada e assenta enquanto o tile aparece */
+    .mood-tile.reveal .mood-photo {
+      transform: scale(1.16);
+      transition: filter 0.6s var(--ease-luxury), transform 1.8s var(--ease-luxury);
+    }
+
+    .mood-tile.reveal.in .mood-photo {
+      transform: scale(1);
+    }
+
+    .mood-tile.reveal.in:hover .mood-photo {
       filter: brightness(0.95) saturate(1);
       transform: scale(1.045);
+      transition: filter 0.6s var(--ease-luxury), transform 1s var(--ease-luxury);
     }
 
     .mood-tile.t1 {
@@ -1060,7 +1215,7 @@
 
     .mood-tile.t4 {
       grid-column: span 4;
-      grid-row: span 2;
+      grid-row: span 3;
     }
 
     .mood-tile.t5 {
@@ -1353,6 +1508,20 @@
       top: 38px;
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--bronze-rock) 10%, var(--bronze-rock) 90%, transparent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.8s var(--ease-luxury);
+    }
+
+    /* A trilha só usa o .reveal como gatilho pra linha se desenhar —
+       os itens dentro dela já têm a própria entrada */
+    .timeline-track.reveal {
+      opacity: 1;
+      transform: none;
+    }
+
+    .timeline-track.reveal.in::before {
+      transform: scaleX(1);
     }
 
     .tl-item {
@@ -1655,6 +1824,11 @@
       to { opacity: 1; }
     }
 
+    @keyframes lightboxZoom {
+      from { transform: scale(0.94); }
+      to { transform: scale(1); }
+    }
+
     .lightbox-img {
       max-width: min(90vw, 720px);
       max-height: 85vh;
@@ -1662,6 +1836,7 @@
       border-radius: 8px;
       box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
       cursor: default;
+      animation: lightboxZoom 0.5s var(--ease-luxury);
     }
 
     .lightbox-close {
@@ -2258,6 +2433,17 @@
 
     .reveal.d1 {
       transition-delay: 0.08s;
+    }
+
+    /* O tracinho antes de cada "01 / ..." se desenha junto com a entrada */
+    .block-eyebrow.reveal::before {
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 1.2s var(--ease-luxury) 0.25s;
+    }
+
+    .block-eyebrow.reveal.in::before {
+      transform: scaleX(1);
     }
 
     .hero-wordmark.reveal {
@@ -3349,13 +3535,11 @@
     crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
     crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
-    integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
-    crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"
     crossorigin="anonymous"></script>
 
-  <script type="text/babel" data-presets="env,react" src="app.jsx"></script>
+  <!-- app.js é o app.jsx já compilado — rode compilar.cmd depois de editar o app.jsx -->
+  <script src="app.js"></script>
 </body>
 
 </html>
